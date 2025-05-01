@@ -1,1 +1,1 @@
-export { useStores, StoresProvider } from "./stores";
+export { useStores, StoresProvider } from './stores';
