@@ -1,4 +1,4 @@
-import { UserStore } from "@entities/User/models";
+import { UserStore } from '@/entities/User/models';
 
 declare global {
   interface IStores {
