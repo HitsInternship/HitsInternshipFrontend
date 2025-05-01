@@ -1,31 +1,9 @@
-import { useStores } from "@shared/contexts";
-import { observer } from "mobx-react-lite";
-import { FC, useState } from "react";
+import { LoginForm } from '@/features/auth/LoginForm';
 
-export const LoginPage: FC = observer(() => {
-  const {
-    userStore: { userName, setUserName },
-  } = useStores();
-
-  const [newUserName, setNewUserName] = useState("");
-
-  const handleChangeUserName = () => {
-    setUserName(newUserName);
-
-    setNewUserName("");
-  };
-
+export const LoginPage = () => {
   return (
-    <>
-      <div>типа логин</div>
-      <div>userName: {userName}</div>
-      <input
-        type="text"
-        value={newUserName}
-        onChange={(e) => setNewUserName(e.target.value)}
-        placeholder="Введите новое имя"
-      />
-      <button onClick={handleChangeUserName}>изменить</button>
-    </>
+    <div className='w-[100vw] h-[100vh] flex items-center justify-center'>
+      <LoginForm />
+    </div>
   );
-});
+};

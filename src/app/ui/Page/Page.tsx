@@ -1,17 +1,18 @@
-import { observer } from "mobx-react-lite";
-import { FC } from "react";
+import { observer } from 'mobx-react-lite';
+import { FC } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
-import { Wrapper } from "./Page.styles";
-import { Navigate, Route, Routes } from "react-router-dom";
-import { LoginPage } from "@pages";
+import { LoginPage } from '@/pages';
+import { ROUTER_PATHS } from '@/shared/consts';
 
 export const Page: FC = observer(() => {
   return (
-    <Wrapper>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<LoginPage />} />
-      </Routes>
-    </Wrapper>
+    <Routes>
+      <Route
+        path={ROUTER_PATHS.HOME}
+        element={<Navigate to={ROUTER_PATHS.LOGIN} replace />}
+      />
+      <Route path={ROUTER_PATHS.LOGIN} element={<LoginPage />} />
+    </Routes>
   );
 });
