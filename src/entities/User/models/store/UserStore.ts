@@ -1,5 +1,5 @@
-import { action, makeAutoObservable } from "mobx";
-import { makePersistable } from "mobx-persist-store";
+import { action, makeAutoObservable } from 'mobx';
+import { makePersistable } from 'mobx-persist-store';
 
 export class UserStore {
   public userName: string | undefined;
@@ -8,8 +8,8 @@ export class UserStore {
     makeAutoObservable(this);
 
     makePersistable(this, {
-      name: "UserStore",
-      properties: ["userName"],
+      name: 'UserStore',
+      properties: ['userName'],
       storage: window.localStorage,
     });
   }

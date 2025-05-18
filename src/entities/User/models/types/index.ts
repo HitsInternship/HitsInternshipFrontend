@@ -1,1 +1,1 @@
-export type { ILoginData } from "./types";
+export type { ILoginData } from './types';

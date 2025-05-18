@@ -1,0 +1,1 @@
+export { InternshipCard } from './InternshipCard';
