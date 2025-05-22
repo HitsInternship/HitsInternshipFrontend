@@ -1,6 +1,5 @@
 import { ReactElement, ReactNode } from 'react';
 import { renderHook } from '@testing-library/react';
-
 import { getStores, muteConsole } from '@shared/jest';
 
 import { StoresProvider } from '../provider';
