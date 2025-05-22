@@ -1,20 +1,23 @@
 import { action, makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
 
+import { TUserRole } from '../types';
+
 export class UserStore {
-  public userName: string | undefined;
+  name?: string;
+  role?: TUserRole = 'employee';
 
   constructor() {
     makeAutoObservable(this);
 
     makePersistable(this, {
       name: 'UserStore',
-      properties: ['userName'],
+      properties: ['name', 'role'],
       storage: window.localStorage,
     });
   }
 
   public setUserName = action((userName: string): void => {
-    this.userName = userName;
+    this.name = userName;
   });
 }

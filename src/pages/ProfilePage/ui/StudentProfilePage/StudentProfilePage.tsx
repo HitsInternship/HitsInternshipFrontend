@@ -8,7 +8,7 @@ import {
   PageLayout,
 } from '@/shared/ui';
 
-export const ProfilePage = () => {
+export const StudentProfilePage = () => {
   return (
     <PageLayout title='Профиль'>
       <Card>
