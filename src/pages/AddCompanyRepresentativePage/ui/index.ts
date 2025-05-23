@@ -1,0 +1,1 @@
+export { AddCompanyPersonPage } from './AddCompanyPersonPage';

@@ -5,13 +5,16 @@ import { Page } from '../Page';
 
 import { StoresProvider } from '@/shared/contexts';
 import { UserStore } from '@/entities/User/models';
+import { CompanyStore } from '@/entities/Company/models';
 
 export const App = () => {
   const queryClient = new QueryClient();
   const userStore = new UserStore();
+  const companyStore = new CompanyStore();
 
   const stores = {
     userStore,
+    companyStore,
   };
 
   return (

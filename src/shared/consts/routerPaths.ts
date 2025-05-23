@@ -3,4 +3,9 @@ export const ROUTER_PATHS = {
   LOGIN: '/login',
   PROFILE: '/profile',
   INTERNSHIP: '/internship',
+  COMPANIES: '/companies',
+  COMPANY: (id: string) => `/companies/${id}`,
+  EDIT_COMPANY: (id: string) => `/companies/${id}/edit`,
+  CREATE_COMPANY: '/companies/new',
+  CREATE_COMPANY_PERSON: '/companies/new-person',
 };

@@ -1,1 +1,1 @@
-export type { ILoginData, TUserRole } from './types';
+export type { ILoginData, TUserRole, IUser } from './types';
