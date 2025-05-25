@@ -3,12 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://elena-karelina.github.io/HitsInternshipFrontend",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -52,6 +54,7 @@
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
+    "gh-pages": "6.3.0",
     "globals": "^15.15.0",
     "husky": "^9.1.7",
     "prettier": "3.5.3",

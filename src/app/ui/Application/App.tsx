@@ -17,7 +17,7 @@ export const App = () => {
   return (
     <StoresProvider stores={stores}>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter basename='/'>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <Page />
         </BrowserRouter>
       </QueryClientProvider>
