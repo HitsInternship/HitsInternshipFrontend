@@ -164,10 +164,9 @@ export const CreateSemesterDialog = ({
             disabled={isCreating || isUpdating}
           >
             {isCreating || isUpdating ? (
-              <Loader2 className='animate-spin' />
-            ) : (
-              'Сохранить'
-            )}
+              <Loader2 className='animate-spin mr-2 h-4 w-4' />
+            ) : null}
+            {isCreating || isUpdating ? 'Сохранение...' : 'Сохранить'}
           </Button>
         </DialogFooter>
       </DialogContent>
