@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-  email: z
+  login: z
     .string()
     .min(1, 'Поле обязательно к заполнению')
     .max(256, 'Слишком длинный email')
