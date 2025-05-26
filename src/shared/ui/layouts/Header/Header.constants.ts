@@ -1,3 +1,5 @@
+import { ROUTER_PATHS } from "@/shared/consts";
+
 export interface IHeaderItem {
   name: string;
   link: string;
@@ -5,14 +7,18 @@ export interface IHeaderItem {
 export const HeaderItems: IHeaderItem[] = [
   {
     name: 'Профиль',
-    link: '/profile',
+    link: ROUTER_PATHS.PROFILE,
   },
   {
     name: 'Стажировки',
-    link: '/internship',
+    link: ROUTER_PATHS.INTERNSHIP,
   },
   {
     name: 'Семестры/Потоки/Группы',
-    link: '/semester-stream-group',
+    link: ROUTER_PATHS.SEMESTER_STREAM_GROUP,
+  },
+  {
+    name: 'Студенты',
+    link: ROUTER_PATHS.STUDENTS,
   },
 ];
