@@ -46,7 +46,7 @@ export const StreamItem = ({
   };
 
   return (
-    <TableRow key={stream.id}>
+    <TableRow>
       <TableCell>{stream.streamNumber}</TableCell>
       <TableCell>{stream.year}</TableCell>
       <TableCell>{stream.course}</TableCell>
@@ -69,11 +69,23 @@ export const StreamItem = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuItem onClick={() => handleEditStream(stream)}>
+            <DropdownMenuItem
+              onClick={() => {
+                requestAnimationFrame(() => {
+                  handleEditStream(stream);
+                });
+              }}
+            >
               <Edit className='mr-2 h-4 w-4' />
               Редактировать
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleAddLink(stream.id)}>
+            <DropdownMenuItem
+              onClick={() => {
+                requestAnimationFrame(() => {
+                  handleAddLink(stream.id);
+                });
+              }}
+            >
               <Link className='mr-2 h-4 w-4' />
               Добавить связь с семестром
             </DropdownMenuItem>
