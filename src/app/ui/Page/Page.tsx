@@ -23,20 +23,20 @@ export const Page: FC = observer(() => {
       <Route element={<MainLayout />}>
         <Route path={ROUTER_PATHS.PROFILE} element={<ProfilePage />} />
         <Route path={ROUTER_PATHS.INTERNSHIP} element={<InternshipPage />} />
+        <Route path={ROUTER_PATHS.COMPANIES} element={<CompaniesPage />} />
+        <Route
+          path={ROUTER_PATHS.CREATE_COMPANY}
+          element={<CreateCompanyPage />}
+        />
+        <Route
+          path={ROUTER_PATHS.EDIT_COMPANY(':id')}
+          element={<EditCompanyPage />}
+        />
+        <Route
+          path={ROUTER_PATHS.CREATE_COMPANY_PERSON}
+          element={<AddCompanyPersonPage />}
+        />
       </Route>
-      <Route path={ROUTER_PATHS.COMPANIES} element={<CompaniesPage />} />
-      <Route
-        path={ROUTER_PATHS.CREATE_COMPANY}
-        element={<CreateCompanyPage />}
-      />
-      <Route
-        path={ROUTER_PATHS.EDIT_COMPANY(':id')}
-        element={<EditCompanyPage />}
-      />
-      <Route
-        path={ROUTER_PATHS.CREATE_COMPANY_PERSON}
-        element={<AddCompanyPersonPage />}
-      />
     </Routes>
   );
 });
