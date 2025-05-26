@@ -11,6 +11,7 @@ import { CompaniesPage } from '@/pages/CompaniesPage';
 import { CreateCompanyPage } from '@/pages/CreateCompanyPage';
 import { EditCompanyPage } from '@/pages/EditCompanyPage';
 import { AddCompanyPersonPage } from '@/pages/AddCompanyRepresentativePage';
+import { SemesterStreamsGroupsPage } from '@/pages/SemesterStreamsGroupsPage';
 
 export const Page: FC = observer(() => {
   return (
@@ -23,20 +24,24 @@ export const Page: FC = observer(() => {
       <Route element={<MainLayout />}>
         <Route path={ROUTER_PATHS.PROFILE} element={<ProfilePage />} />
         <Route path={ROUTER_PATHS.INTERNSHIP} element={<InternshipPage />} />
-        <Route path={ROUTER_PATHS.COMPANIES} element={<CompaniesPage />} />
         <Route
-          path={ROUTER_PATHS.CREATE_COMPANY}
-          element={<CreateCompanyPage />}
-        />
-        <Route
-          path={ROUTER_PATHS.EDIT_COMPANY(':id')}
-          element={<EditCompanyPage />}
-        />
-        <Route
-          path={ROUTER_PATHS.CREATE_COMPANY_PERSON}
-          element={<AddCompanyPersonPage />}
+          path={ROUTER_PATHS.SEMESTER_STREAM_GROUP}
+          element={<SemesterStreamsGroupsPage />}
         />
       </Route>
+      <Route path={ROUTER_PATHS.COMPANIES} element={<CompaniesPage />} />
+      <Route
+        path={ROUTER_PATHS.CREATE_COMPANY}
+        element={<CreateCompanyPage />}
+      />
+      <Route
+        path={ROUTER_PATHS.EDIT_COMPANY(':id')}
+        element={<EditCompanyPage />}
+      />
+      <Route
+        path={ROUTER_PATHS.CREATE_COMPANY_PERSON}
+        element={<AddCompanyPersonPage />}
+      />
     </Routes>
   );
 });
