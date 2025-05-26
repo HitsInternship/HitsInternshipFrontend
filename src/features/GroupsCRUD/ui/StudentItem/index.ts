@@ -1,0 +1,1 @@
+export { StudentItem } from './StudentItem';

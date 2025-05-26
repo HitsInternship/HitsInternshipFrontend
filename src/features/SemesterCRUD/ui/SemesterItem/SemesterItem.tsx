@@ -47,12 +47,22 @@ export const SemesterItem = ({
           <DropdownMenuContent align='end'>
             {!semester.isDeleted && (
               <>
-                <DropdownMenuItem onClick={() => handleEditSemester(semester)}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    requestAnimationFrame(() => {
+                      handleEditSemester(semester);
+                    });
+                  }}
+                >
                   <Edit className='mr-2 h-4 w-4' />
                   Редактировать
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => handleArchiveSemester(semester.id)}
+                  onClick={() => {
+                    requestAnimationFrame(() => {
+                      handleArchiveSemester(semester.id);
+                    });
+                  }}
                 >
                   <Archive className='mr-2 h-4 w-4' />
                   Архивировать
@@ -61,7 +71,11 @@ export const SemesterItem = ({
             )}
             <DropdownMenuItem
               className='text-destructive focus:text-destructive'
-              onClick={() => handleDeleteSemester(semester.id)}
+              onClick={() => {
+                requestAnimationFrame(() => {
+                  handleDeleteSemester(semester.id);
+                });
+              }}
             >
               <Trash2 className='mr-2 h-4 w-4' />
               Удалить
