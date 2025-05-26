@@ -1,4 +1,4 @@
-import { Student } from '@/features/GroupsCRUD/model';
+import { Student } from '@/entities/Groups';
 
 export interface StudentItemProps {
   student: Student;

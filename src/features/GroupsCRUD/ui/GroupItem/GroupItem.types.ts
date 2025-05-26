@@ -1,4 +1,4 @@
-import { Group, Student } from '@/features/GroupsCRUD/model';
+import { Group, Student } from '@/entities/Groups';
 import { Stream } from '@/features/StreamsCRUD/model';
 
 export interface GroupItemProps {
