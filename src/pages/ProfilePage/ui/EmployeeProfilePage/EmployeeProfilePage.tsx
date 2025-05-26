@@ -1,4 +1,4 @@
-import { Building, Mail, Phone, UserPlus, Users } from 'lucide-react';
+import { Building, Mail, Phone } from 'lucide-react';
 
 import {
   Card,
@@ -7,6 +7,8 @@ import {
   CardTitle,
   PageLayout,
 } from '@/shared/ui';
+import { CreateStudent } from '@/features/CreateStudent';
+import { CreateEmployee } from '@/features/CreateEmployee';
 
 // Пример данных
 const adminData = {
@@ -65,29 +67,9 @@ export const EmployeeProfilePage = () => {
       <div className='mt-8'>
         <h2 className='text-xl font-semibold mb-4'>Быстрые действия</h2>
         <div className='grid grid-cols-1 sm:grid-cols-2  gap-4'>
-          <Card className='hover:bg-muted/50 transition-colors cursor-pointer'>
-            <CardContent className='pt-6'>
-              <div className='flex flex-col items-center text-center'>
-                <UserPlus className='h-8 w-8 mb-2' />
-                <h3 className='font-medium'>Создать студента</h3>
-                <p className='text-sm text-muted-foreground mt-1'>
-                  Добавить нового студента в систему
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <CreateStudent />
 
-          <Card className='hover:bg-muted/50 transition-colors cursor-pointer'>
-            <CardContent className='pt-6'>
-              <div className='flex flex-col items-center text-center'>
-                <Users className='h-8 w-8 mb-2' />
-                <h3 className='font-medium'>Создать сотрудника</h3>
-                <p className='text-sm text-muted-foreground mt-1'>
-                  Добавить нового сотрудника деканата
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <CreateEmployee />
         </div>
       </div>
     </PageLayout>

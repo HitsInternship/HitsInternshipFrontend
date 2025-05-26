@@ -28,20 +28,20 @@ export const Page: FC = observer(() => {
           path={ROUTER_PATHS.SEMESTER_STREAM_GROUP}
           element={<SemesterStreamsGroupsPage />}
         />
+        <Route path={ROUTER_PATHS.COMPANIES} element={<CompaniesPage />} />
+        <Route
+          path={ROUTER_PATHS.CREATE_COMPANY}
+          element={<CreateCompanyPage />}
+        />
+        <Route
+          path={ROUTER_PATHS.EDIT_COMPANY(':id')}
+          element={<EditCompanyPage />}
+        />
+        <Route
+          path={ROUTER_PATHS.CREATE_COMPANY_PERSON}
+          element={<AddCompanyPersonPage />}
+        />
       </Route>
-      <Route path={ROUTER_PATHS.COMPANIES} element={<CompaniesPage />} />
-      <Route
-        path={ROUTER_PATHS.CREATE_COMPANY}
-        element={<CreateCompanyPage />}
-      />
-      <Route
-        path={ROUTER_PATHS.EDIT_COMPANY(':id')}
-        element={<EditCompanyPage />}
-      />
-      <Route
-        path={ROUTER_PATHS.CREATE_COMPANY_PERSON}
-        element={<AddCompanyPersonPage />}
-      />
     </Routes>
   );
 });

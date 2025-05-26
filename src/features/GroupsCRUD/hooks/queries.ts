@@ -1,19 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { Group } from '@/features/GroupsCRUD/model';
 import {
   createGroup,
   deleteGroup,
-  getGroups,
   updateGroup,
 } from '@/features/GroupsCRUD/api';
-
-export const useGroups = () => {
-  return useQuery<Group[]>({
-    queryKey: ['groups'],
-    queryFn: getGroups,
-  });
-};
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
