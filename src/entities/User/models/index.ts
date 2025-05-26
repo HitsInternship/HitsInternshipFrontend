@@ -1,2 +1,2 @@
-export { type ILoginData, type TUserRole } from './types';
+export type { ILoginData, TUserRole, IUser } from './types';
 export { UserStore } from './store';

@@ -1,0 +1,1 @@
+export { CompanyStatusBadge } from './CompanyStatusBadge';

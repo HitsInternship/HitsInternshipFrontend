@@ -25,7 +25,7 @@ export const LoginForm = () => {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
+      login: '',
       password: '',
     },
   });
@@ -44,21 +44,21 @@ export const LoginForm = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className='flex flex-col gap-6'>
             <div className='grid gap-3'>
-              <Label htmlFor='email'>Эл. почта</Label>
+              <Label htmlFor='login'>Эл. почта</Label>
               <Controller
-                name='email'
+                name='login'
                 control={control}
                 render={({ field }) => (
                   <Input
                     {...field}
-                    id='email'
+                    id='login'
                     type='email'
                     placeholder='m@example.com'
                   />
                 )}
               />
-              {errors.email && (
-                <p className='text-sm text-red-500'>{errors.email.message}</p>
+              {errors.login && (
+                <p className='text-sm text-red-500'>{errors.login.message}</p>
               )}
             </div>
             <div className='grid gap-3'>
