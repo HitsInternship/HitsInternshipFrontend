@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { PlusCircle } from 'lucide-react';
 
-import { useGroups } from '@/features/GroupsCRUD/hooks';
 import { Group } from '@/features/StreamsCRUD/model/types';
 import { GroupDialog } from '@/features/GroupsCRUD/ui/GroupDialog';
 import { useStreams } from '@/features/StreamsCRUD/hooks';
@@ -14,6 +13,7 @@ import {
   CardTitle,
 } from '@/shared/ui';
 import { GroupItem } from '@/features/GroupsCRUD/ui/GroupItem';
+import { useGroups } from '@/entities/Groups';
 
 export const GroupsList = () => {
   const { data: groups = [] } = useGroups();

@@ -1,6 +1,1 @@
-export {
-  useCreateGroup,
-  useDeleteGroup,
-  useGroups,
-  useUpdateGroup,
-} from './queries';
+export { useCreateGroup, useDeleteGroup, useUpdateGroup } from './queries';
