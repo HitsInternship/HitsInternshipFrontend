@@ -31,8 +31,7 @@ export const SemesterList = () => {
   const { mutateAsync: deleteOrArchive } = useDeleteOrArchiveSemester();
   const [showArchived, setShowArchived] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data: semesters = [], isPending: isLoading } =
-    useSemesters(showArchived);
+  const { data: semesters = [] } = useSemesters(showArchived);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentSemester, setCurrentSemester] = useState<Semester | null>(null);
 
