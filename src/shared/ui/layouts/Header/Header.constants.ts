@@ -11,4 +11,8 @@ export const HeaderItems: IHeaderItem[] = [
     name: 'Стажировки',
     link: '/internship',
   },
+  {
+    name: 'Семестры/Потоки/Группы',
+    link: '/semester-stream-group',
+  },
 ];
