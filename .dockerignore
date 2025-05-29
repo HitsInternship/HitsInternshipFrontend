@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+.git
+.gitignore
+.husky
+.prettierignore
+actions-runner*
+Dockerfile
+docker-compose.yml

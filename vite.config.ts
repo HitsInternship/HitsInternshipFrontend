@@ -12,4 +12,12 @@ export default defineConfig({
     },
   },
   base: '/HitsInternshipFrontend',
+  server: {
+    host: true,
+    port: 5175,
+    strictPort: true,
+    hmr: {
+      port: 5175,
+    },
+  },
 });
