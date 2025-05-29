@@ -28,8 +28,6 @@ jobs:
           docker build \
             --no-cache \
             --network=host \
-            --dns 8.8.8.8 \
-            --dns 1.1.1.1 \
             --add-host registry.npmjs.org:185.199.108.153 \
             --add-host registry.npmmirror.com:104.16.87.35 \
             -t my-vite-app:prod .
