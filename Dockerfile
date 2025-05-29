@@ -1,10 +1,12 @@
 FROM node:20-alpine
 
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf.tmp && \
-    echo "nameserver 1.1.1.1" >> /etc/resolv.conf.tmp && \
-    mount --bind /etc/resolv.conf.tmp /etc/resolv.conf || true
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.18/main' > /etc/apk/repositories && \
+    echo 'http://dl-cdn.alpinelinux.org/alpine/v3.18/community' >> /etc/apk/repositories && \
+    apk add --no-cache ca-certificates openssl && \
+    update-ca-certificates
 
-RUN npm config set registry https://registry.npmjs.org/ && \
+RUN npm config set strict-ssl false && \
+    npm config set registry https://registry.npmjs.org/ && \
     npm config set fetch-retry-mintimeout 20000 && \
     npm config set fetch-retry-maxtimeout 120000
 
@@ -13,7 +15,8 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN (npm install --verbose || \
-     (npm config set registry https://registry.npmmirror.com && npm install --verbose))
+     (npm config set registry https://registry.npmmirror.com && \
+      npm install --verbose))
 
 COPY . .
 
