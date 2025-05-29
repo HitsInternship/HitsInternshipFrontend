@@ -1,15 +1,19 @@
 FROM node:20-alpine
 
-RUN echo "nameserver 8.8.8.8" > /tmp/resolv.conf && \
-    echo "nameserver 1.1.1.1" >> /tmp/resolv.conf && \
-    cat /tmp/resolv.conf > /etc/resolv.conf || true && \
-    npm config set registry https://registry.npmmirror.com
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf.tmp && \
+    echo "nameserver 1.1.1.1" >> /etc/resolv.conf.tmp && \
+    mount --bind /etc/resolv.conf.tmp /etc/resolv.conf || true
+
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
-RUN npm install --verbose
+RUN (npm install --verbose || \
+     (npm config set registry https://registry.npmmirror.com && npm install --verbose))
 
 COPY . .
 
