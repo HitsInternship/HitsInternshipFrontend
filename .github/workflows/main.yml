@@ -26,12 +26,11 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           docker build \
-            --no-cache \
-            --network=host \
-            --add-host registry.npmjs.org:185.199.108.153 \
-            --add-host registry.yarnpkg.com:185.199.108.153 \
-            --add-host registry.npmmirror.com:104.16.87.35 \
-            -t my-vite-app:prod .
+          --no-cache \
+          --network=host \
+          --add-host registry.npmjs.org:185.199.108.153 \
+          --add-host registry.yarnpkg.com:185.199.108.153 \
+          -t my-vite-app:prod .
 
       - name: Deploy
         run: |
