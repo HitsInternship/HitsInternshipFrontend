@@ -8,14 +8,14 @@ services:
       dockerfile: Dockerfile
       network: host
     ports:
-      - "5175:5175"
+      - "4173:4173"
     volumes:
       - .:/app
       - /app/node_modules
     environment:
       - NODE_ENV=production
       - VITE_API_URL=http://5.129.202.183:8080/api
-      - VITE_API_URL_BASE=http://5.129.202.183:8080:8080
+      - VITE_API_URL_BASE=http://5.129.202.183:8080
     env_file:
       - .env
-    command: npm run dev
+    command: sh -c "npm run build && npm run preview"

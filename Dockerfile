@@ -30,5 +30,7 @@ RUN npm ci --verbose || \
 
 COPY . .
 
-EXPOSE 5175
-CMD ["npm", "run", "dev"]
+RUN npm run build
+
+EXPOSE 4173
+CMD ["npm", "run", "preview"]
