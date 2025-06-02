@@ -11,5 +11,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  base: '/HitsInternshipFrontend',
+  base: '/',
+  server: {
+    host: true,
+    port: 5175,
+    strictPort: true,
+    hmr: {
+      port: 5175,
+    },
+  },
 });
