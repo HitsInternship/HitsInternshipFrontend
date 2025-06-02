@@ -5,15 +5,16 @@ import { TUserRole } from '../types';
 
 export class UserStore {
   name?: string;
-  role?: TUserRole = 'employee';
+  roles: TUserRole[] = [];
   isAuthorized: boolean = false;
+  isHydrated: boolean = false;
 
   constructor() {
     makeAutoObservable(this);
 
     makePersistable(this, {
       name: 'UserStore',
-      properties: ['name', 'role', 'isAuthorized'],
+      properties: ['name', 'roles', 'isAuthorized'],
       storage: window.localStorage,
     });
   }
@@ -23,6 +24,14 @@ export class UserStore {
   });
 
   public setIsAuthorized = action((isAuthorized: boolean): void => {
+    this.isAuthorized = isAuthorized;
+  });
+
+  public setRoles = action((roles: TUserRole[]): void => {
+    this.roles = roles;
+  });
+
+  public dataInstallation = action((isAuthorized: boolean): void => {
     this.isAuthorized = isAuthorized;
   });
 }

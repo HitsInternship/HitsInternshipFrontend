@@ -1,12 +1,18 @@
+import { observer } from 'mobx-react-lite';
+
 import { EmployeeProfilePage } from '../EmployeeProfilePage';
 import { StudentProfilePage } from '../StudentProfilePage';
 
 import { useStores } from '@/shared/contexts';
 
-export const ProfilePage = () => {
+export const ProfilePage = observer(() => {
   const {
-    userStore: { role },
+    userStore: { roles },
   } = useStores();
-  console.log(role);
-  return role === 'student' ? <StudentProfilePage /> : <EmployeeProfilePage />;
-};
+
+  if (roles?.includes('Student')) {
+    return <StudentProfilePage />;
+  }
+
+  return <EmployeeProfilePage />;
+});

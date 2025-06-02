@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { PlusCircle } from 'lucide-react';
 
-import { Group } from '@/features/StreamsCRUD/model/types';
 import { GroupDialog } from '@/features/GroupsCRUD/ui/GroupDialog';
 import { useStreams } from '@/features/StreamsCRUD/hooks';
 import {
@@ -13,7 +12,7 @@ import {
   CardTitle,
 } from '@/shared/ui';
 import { GroupItem } from '@/features/GroupsCRUD/ui/GroupItem';
-import { useGroups } from '@/entities/Groups';
+import { Group, useGroups } from '@/entities/Groups';
 
 export const GroupsList = () => {
   const { data: groups = [] } = useGroups();
@@ -72,7 +71,7 @@ export const GroupsList = () => {
               groups.map((group) => {
                 const streamInfo = getStreamInfo(group.streamId);
                 const isExpanded = expandedGroups.has(group.id);
-                const headMan = group.students.find((s) => s.isHeadMan);
+                const headMan = group.students?.find((s) => s.isHeadMan);
 
                 return (
                   <GroupItem
