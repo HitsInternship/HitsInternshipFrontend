@@ -4,10 +4,9 @@ import {
   UpdateSemesterDto,
 } from '@/features/SemesterCRUD/model';
 import { api } from '@/shared/api';
-import { BASE_URL_NO_API } from '@/shared/consts/baseUrl';
 
 export const getSemesters = async (isArchive: boolean): Promise<Semester[]> => {
-  const { data } = await api.get<Semester[]>(`${BASE_URL_NO_API}/semester`, {
+  const { data } = await api.get<Semester[]>(`/semester`, {
     params: {
       isArchive,
     },
@@ -19,21 +18,21 @@ export const getSemesters = async (isArchive: boolean): Promise<Semester[]> => {
 export const createSemester = async (
   payload: CreateSemesterDto,
 ): Promise<void> => {
-  await api.post(`${BASE_URL_NO_API}/semester`, payload);
+  await api.post(`/semester`, payload);
 };
 
 export const updateSemester = async (
   semesterId: string,
   payload: UpdateSemesterDto,
 ): Promise<void> => {
-  await api.put(`${BASE_URL_NO_API}/semester/${semesterId}`, payload);
+  await api.put(`/semester/${semesterId}`, payload);
 };
 
 export const deleteOrArchiveSemester = async (
   semesterId: string,
   isArchive: boolean,
 ): Promise<void> => {
-  await api.delete(`${BASE_URL_NO_API}/semester/${semesterId}`, {
+  await api.delete(`/semester/${semesterId}`, {
     params: { isArchive },
   });
 };

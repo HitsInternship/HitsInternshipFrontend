@@ -50,7 +50,7 @@ export interface Group {
   id: string;
   groupNumber: number;
   streamId: string;
-  students: Student[];
+  students: Student[] | null;
 }
 
 export interface StreamSemester {

@@ -72,7 +72,7 @@ export const GroupsList = () => {
               groups.map((group) => {
                 const streamInfo = getStreamInfo(group.streamId);
                 const isExpanded = expandedGroups.has(group.id);
-                const headMan = group.students.find((s) => s.isHeadMan);
+                const headMan = group.students?.find((s) => s.isHeadMan);
 
                 return (
                   <GroupItem
