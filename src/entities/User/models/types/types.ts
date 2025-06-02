@@ -7,8 +7,6 @@ export interface ILoginData {
   password: string;
 }
 
-export type TUserRole = 'Student' | 'DeanMember' | 'Curator';
-
 export type TStudentStatus =
   | 'Expelled'
   | 'OnAcademicLeave'
@@ -17,6 +15,12 @@ export type TStudentStatus =
   | 'Graduated';
 
 export type TInternshipStatus = 'Small' | 'Candidate' | 'Intern';
+
+export enum UserRole {
+  Student = 'Student',
+  Curator = 'Curator',
+  DeanMember = 'DeanMember',
+}
 
 export interface IUser {
   name: string;
@@ -35,4 +39,10 @@ export interface IStudent {
   internshipStatus: TInternshipStatus;
   groupNumber: number;
   course: number;
+}
+export interface UserSearchOptions {
+  name?: string;
+  surname?: string;
+  email?: string;
+  roles?: UserRole[];
 }

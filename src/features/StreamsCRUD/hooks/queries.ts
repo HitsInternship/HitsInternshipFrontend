@@ -21,6 +21,7 @@ export const useStreams = () => {
   return useQuery({
     queryKey: ['streams'],
     queryFn: getStreams,
+    gcTime: 3 * 60 * 1000,
   });
 };
 

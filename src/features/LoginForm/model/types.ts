@@ -1,9 +1,9 @@
-import { TUserRole } from '@/entities/User/models';
+import { UserRole } from '@/entities/User/models';
 
 export interface TokenResponse {
   accessToken: string;
   refreshToken: string;
-  roles: TUserRole[];
+  roles: UserRole[];
 }
 
 export interface LoginResponse {

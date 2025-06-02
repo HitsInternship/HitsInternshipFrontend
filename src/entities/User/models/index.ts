@@ -1,2 +1,3 @@
-export type { ILoginData, TUserRole, IUser, IStudent } from './types';
+export type { ILoginData, IUser, UserSearchOptions, IStudent } from './types';
+export { UserRole } from './types';
 export { UserStore } from './store';

@@ -1,1 +1,1 @@
-export type { ILoginData, TUserRole, IUser, UserStore } from './models';
+export type { ILoginData, IStudent, IUser, UserStore } from './models';
