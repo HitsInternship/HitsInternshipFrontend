@@ -68,7 +68,7 @@ export const GroupItem = ({
                   <CardDescription>
                     Поток: {streamInfo?.streamNumber || 'Неизвестно'} (
                     {streamInfo?.year || 'N/A'}) • Студентов:{' '}
-                    {group.students.length}
+                    {group.students?.length ?? 0}
                     {headMan && (
                       <>
                         {' '}
@@ -128,7 +128,7 @@ export const GroupItem = ({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <CardContent>
-            {group.students.length === 0 ? (
+            {!group.students || group.students.length === 0 ? (
               <div className='text-center py-8 text-muted-foreground'>
                 <Users className='mx-auto h-12 w-12 mb-4 opacity-50' />
                 <p>В группе пока нет студентов</p>
