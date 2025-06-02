@@ -2,11 +2,14 @@ import { EmployeeProfilePage } from '../EmployeeProfilePage';
 import { StudentProfilePage } from '../StudentProfilePage';
 
 import { useStores } from '@/shared/contexts';
+import { UserRole } from '@/entities/User/models';
 
 export const ProfilePage = () => {
   const {
-    userStore: { role },
+    userStore: { roles },
   } = useStores();
-  console.log(role);
-  return role === 'student' ? <StudentProfilePage /> : <EmployeeProfilePage />;
+
+  const isStudent = roles.includes(UserRole.Student);
+
+  return isStudent ? <StudentProfilePage /> : <EmployeeProfilePage />;
 };
