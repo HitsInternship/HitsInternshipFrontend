@@ -1,11 +1,11 @@
 import { action, makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
 
-import { TUserRole } from '../types';
+import { UserRole } from '../../models';
 
 export class UserStore {
   name?: string;
-  role?: TUserRole = 'employee';
+  roles: UserRole[] = [];
   isAuthorized: boolean = false;
 
   constructor() {
@@ -13,7 +13,7 @@ export class UserStore {
 
     makePersistable(this, {
       name: 'UserStore',
-      properties: ['name', 'role', 'isAuthorized'],
+      properties: ['name', 'roles', 'isAuthorized'],
       storage: window.localStorage,
     });
   }
@@ -24,5 +24,9 @@ export class UserStore {
 
   public setIsAuthorized = action((isAuthorized: boolean): void => {
     this.isAuthorized = isAuthorized;
+  });
+
+  public setUserRole = action((role: UserRole[]): void => {
+    this.roles = role;
   });
 }

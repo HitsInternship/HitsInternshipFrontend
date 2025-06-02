@@ -1,6 +1,6 @@
 import { CompanyStatus } from '@/entities/Company/models';
 
-export const BASE_COMPANIES_URL = '/companies';
+export const BASE_COMPANIES_URL = '/api/companies';
 
 export const COMPANY_ENDPOINTS = {
   GET_COMPANIES: BASE_COMPANIES_URL,

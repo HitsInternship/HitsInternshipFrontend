@@ -1,15 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   MoreHorizontal,
   Search,
-  UserPlus,
-  Edit,
-  Trash2,
   Eye,
   Crown,
   Mail,
   Phone,
   LoaderCircle,
+  FilterX,
 } from 'lucide-react';
 
 import {
@@ -17,6 +15,7 @@ import {
   getStatusColor,
   getStatusText,
 } from './StudentPage.utils';
+import { CreateStudentModal } from '../CreateStudentModal';
 
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
@@ -36,149 +35,188 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import { Badge } from '@/shared/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { IStudent } from '@/entities/Student';
+import type { IStudent } from '@/entities/Student';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/shared/ui/select.tsx';
-import { Label, PageLayout } from '@/shared/ui';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/shared/ui/dialog.tsx';
-import { Checkbox } from '@/shared/ui/checkbox.tsx';
-import { useStudents } from '@/entities/Student/hooks/useStudents.ts';
+} from '@/shared/ui/select';
+import { Label } from '@/shared/ui';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
+import { useStreams } from '@/features/StreamsCRUD/hooks';
+import { useGroups } from '@/entities/Groups';
+import { useStudentsByGroup, useStudentsByStream } from '@/entities/Student';
 
 export const StudentsPage = () => {
-  const { data: students, isLoading } = useStudents();
+  const [selectedStreamId, setSelectedStreamId] = useState('');
+  const [selectedGroupId, setSelectedGroupId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [editedStudent, setEditedStudent] = useState<IStudent | null>(null);
+  const [activeFilter, setActiveFilter] = useState<'stream' | 'group'>(
+    'stream',
+  );
 
-  const filteredStudents = students?.filter((student) => {
+  const { data: streams, isLoading: isLoadingStreams } = useStreams();
+  const { data: allGroups, isLoading: isLoadingAllGroups } = useGroups();
+
+  const { data: streamStudents, isLoading: isLoadingStreamStudents } =
+    useStudentsByStream(selectedStreamId);
+
+  const { data: groupStudents, isLoading: isLoadingGroupStudents } =
+    useStudentsByGroup(selectedGroupId);
+
+  const students = activeFilter === 'stream' ? streamStudents : groupStudents;
+
+  const filteredStudents = students?.filter((student: IStudent) => {
     const fullName = getFullName(student).toLowerCase();
     const email = student.email?.toLowerCase() || '';
-    const groupNumber = student.groupNumber?.toString() || '';
     const search = searchTerm.toLowerCase();
 
-    return (
-      fullName.includes(search) ||
-      email.includes(search) ||
-      groupNumber.includes(search)
-    );
+    return fullName.includes(search) || email.includes(search);
   });
+
+  useEffect(() => {
+    if (activeFilter === 'stream' && selectedGroupId) {
+      setSelectedGroupId('');
+    } else if (activeFilter === 'group' && selectedStreamId) {
+      setSelectedStreamId('');
+    }
+  }, [activeFilter, selectedGroupId, selectedStreamId]);
+
+  const handleStreamChange = (streamId: string) => {
+    setSelectedStreamId(streamId);
+    setActiveFilter('stream');
+  };
+
+  const handleGroupChange = (groupId: string) => {
+    setSelectedGroupId(groupId);
+    setActiveFilter('group');
+  };
+
+  const handleClearFilters = () => {
+    setSelectedStreamId('');
+    setSelectedGroupId('');
+    setSearchTerm('');
+  };
 
   const handleViewStudent = (studentId: string) => {
     console.log('Просмотр студента:', studentId);
     // Здесь будет логика просмотра студента
   };
 
-  const handleEditStudent = (studentId: string) => {
-    console.log('Редактирование студента:', studentId);
-    const student = students?.find((student) => student.id === studentId);
-    if (student) {
-      setEditedStudent(student);
-    }
-  };
+  const isLoading =
+    isLoadingStreams ||
+    isLoadingAllGroups ||
+    isLoadingStreamStudents ||
+    isLoadingGroupStudents;
 
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-[90vh] w-full'>
-        <LoaderCircle className='h-8 w-8 animate-spin text-black-500 dark:text-gray-300' />
-      </div>
-    );
-  }
+  const hasActiveFilter = selectedStreamId || selectedGroupId;
 
   return (
     <>
-      <PageLayout
-        title='Студенты'
-        subTitle='Управление студентами и их данными'
-      >
-        <div className='container mx-auto py-6 space-y-6'>
-          <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
-            <Dialog>
-              <DialogTrigger>
-                <Button>
-                  <UserPlus className='mr-2 h-4 w-4' />
-                  Добавить студента
-                </Button>
-              </DialogTrigger>
-              <DialogContent className='sm:max-w-[600px]'>
-                <DialogHeader>
-                  <DialogTitle> Добавить студента</DialogTitle>
-                </DialogHeader>
-                <form className='space-y-4'>
-                  <div className='grid grid-cols-2 gap-4'>
-                    <div className='space-y-2'>
-                      <Label htmlFor='edit-surname'>Фамилия *</Label>
-                      <Input id='edit-surname' required />
-                    </div>
-                    <div className='space-y-2'>
-                      <Label htmlFor='edit-name'>Имя *</Label>
-                      <Input id='edit-name' required />
-                    </div>
-                  </div>
-
-                  <div className='space-y-2'>
-                    <Label htmlFor='edit-middlename'>Отчество</Label>
-                    <Input id='edit-middlename' />
-                  </div>
-
-                  <div className='grid grid-cols-2 gap-4'>
-                    <div className='space-y-2'>
-                      <Label htmlFor='edit-email'>Email *</Label>
-                      <Input id='edit-email' type='email' required />
-                    </div>
-                    <div className='space-y-2'>
-                      <Label htmlFor='edit-phone'>Телефон</Label>
-                      <Input id='edit-phone' placeholder='+7 (999) 123-45-67' />
-                    </div>
-                  </div>
-
-                  <div className='grid grid-cols-2 gap-4'>
-                    <div className='space-y-2'>
-                      <Label htmlFor='edit-status'>Статус</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value='InProcess'>Обучается</SelectItem>
-                          <SelectItem value='OnAcademicLeave'>
-                            Академический отпуск
-                          </SelectItem>
-                          <SelectItem value='Graduated'>Выпускник</SelectItem>
-                          <SelectItem value='Expelled'>Отчислен</SelectItem>
-                          <SelectItem value='Transfered'>Переведен</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className='space-y-2'>
-                      <Label htmlFor='edit-groupId'>Номер группы</Label>
-                      <Input id='edit-groupId' placeholder='101' />
-                    </div>
-                  </div>
-
-                  <div className='flex items-center space-x-2'>
-                    <Checkbox id='edit-isHeadMan' />
-                    <Label htmlFor='edit-isHeadMan'>Староста группы</Label>
-                  </div>
-
-                  <div className='flex justify-end space-x-2 pt-4'>
-                    <Button type='submit'>Сохранить изменения</Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
+      <div className='container mx-auto py-6 space-y-6'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
+          <div>
+            <h1 className='text-3xl font-bold tracking-tight'>Студенты</h1>
+            <p className='text-muted-foreground'>
+              Управление студентами и их данными
+            </p>
           </div>
+          <CreateStudentModal />
+        </div>
 
-          {/* Статистика */}
+        <Card>
+          <CardHeader>
+            <div className='flex justify-between items-center'>
+              <CardTitle>Фильтры</CardTitle>
+              {hasActiveFilter && (
+                <Button variant='ghost' size='sm' onClick={handleClearFilters}>
+                  <FilterX className='mr-2 h-4 w-4' />
+                  Сбросить фильтры
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Tabs
+              defaultValue='stream'
+              value={activeFilter}
+              onValueChange={(value) =>
+                setActiveFilter(value as 'stream' | 'group')
+              }
+            >
+              <TabsList className='mb-4'>
+                <TabsTrigger value='stream'>По потоку</TabsTrigger>
+                <TabsTrigger value='group'>По группе</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value='stream'>
+                <div className='space-y-2'>
+                  <Label htmlFor='stream-select'>Выберите поток</Label>
+                  <Select
+                    value={selectedStreamId}
+                    onValueChange={handleStreamChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder='Выберите поток' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {isLoadingStreams ? (
+                        <SelectItem value='loading' disabled>
+                          Загрузка...
+                        </SelectItem>
+                      ) : streams?.length ? (
+                        streams.map((stream) => (
+                          <SelectItem key={stream.id} value={stream.id}>
+                            {stream.streamNumber || `Поток ${stream.id}`}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value='no-streams' disabled>
+                          Нет доступных потоков
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </TabsContent>
+
+              <TabsContent value='group'>
+                <div className='space-y-2'>
+                  <Label htmlFor='group-select'>Выберите группу</Label>
+                  <Select
+                    value={selectedGroupId}
+                    onValueChange={handleGroupChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder='Выберите группу' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {isLoadingAllGroups ? (
+                        <SelectItem value='loading' disabled>
+                          Загрузка...
+                        </SelectItem>
+                      ) : allGroups?.length ? (
+                        allGroups.map((group) => (
+                          <SelectItem key={group.id} value={group.id}>
+                            Группа {group.groupNumber}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value='no-groups' disabled>
+                          Нет доступных групп
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        {hasActiveFilter && students && (
           <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
@@ -223,21 +261,44 @@ export const StudentsPage = () => {
               </CardContent>
             </Card>
           </div>
+        )}
 
-          {/* Поиск */}
+        {hasActiveFilter && (
           <div className='flex items-center space-x-2'>
             <div className='relative flex-1 max-w-sm'>
               <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
               <Input
-                placeholder='Поиск по имени, email или группе...'
+                placeholder='Поиск по имени или email...'
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className='pl-8'
               />
             </div>
           </div>
+        )}
 
-          {/* Таблица студентов */}
+        {isLoading && (
+          <div className='flex items-center justify-center h-[400px] w-full'>
+            <LoaderCircle className='h-8 w-8 animate-spin text-black-500 dark:text-gray-300' />
+          </div>
+        )}
+
+        {!hasActiveFilter && !isLoading && (
+          <Card>
+            <CardContent className='flex items-center justify-center h-[400px]'>
+              <div className='text-center'>
+                <h3 className='text-lg font-medium text-muted-foreground mb-2'>
+                  Выберите фильтр
+                </h3>
+                <p className='text-sm text-muted-foreground'>
+                  Для просмотра студентов необходимо выбрать поток или группу
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {hasActiveFilter && !isLoading && (
           <Card>
             <CardContent className='p-0'>
               <Table>
@@ -245,7 +306,7 @@ export const StudentsPage = () => {
                   <TableRow>
                     <TableHead>ФИО</TableHead>
                     <TableHead>Контакты</TableHead>
-                    <TableHead>Группа</TableHead>
+                    {activeFilter === 'stream' && <TableHead>Группа</TableHead>}
                     <TableHead>Курс</TableHead>
                     <TableHead>Статус</TableHead>
                     <TableHead>Роль</TableHead>
@@ -274,9 +335,11 @@ export const StudentsPage = () => {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        {student.groupNumber || 'Не указана'}
-                      </TableCell>
+                      {activeFilter === 'stream' && (
+                        <TableCell>
+                          {student.groupNumber || 'Не указана'}
+                        </TableCell>
+                      )}
                       <TableCell>{student.course || 'Не указан'}</TableCell>
                       <TableCell>
                         <Badge className={getStatusColor(student.status)}>
@@ -284,13 +347,20 @@ export const StudentsPage = () => {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {student.isHeadMan && (
+                        {student.isHeadMan ? (
                           <Badge
                             variant='outline'
                             className='bg-amber-50 text-amber-700 border-amber-200'
                           >
                             <Crown className='mr-1 h-3 w-3' />
                             Староста
+                          </Badge>
+                        ) : (
+                          <Badge
+                            variant='outline'
+                            className='bg-gray-50 text-gray-700 border-gray-200'
+                          >
+                            Студент
                           </Badge>
                         )}
                       </TableCell>
@@ -309,152 +379,8 @@ export const StudentsPage = () => {
                               <Eye className='mr-2 h-4 w-4' />
                               Просмотр
                             </DropdownMenuItem>
-                            <Dialog>
-                              <DialogTrigger>
-                                <Button
-                                  variant='ghost'
-                                  onClick={() => {
-                                    handleEditStudent(student.id);
-                                  }}
-                                >
-                                  <Edit className='mr-2 h-4 w-4' />
-                                  Редактировать
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className='sm:max-w-[600px]'>
-                                <DialogHeader>
-                                  <DialogTitle>
-                                    Редактировать студента
-                                  </DialogTitle>
-                                </DialogHeader>
-                                <form className='space-y-4'>
-                                  <div className='grid grid-cols-2 gap-4'>
-                                    <div className='space-y-2'>
-                                      <Label htmlFor='edit-surname'>
-                                        Фамилия *
-                                      </Label>
-                                      <Input
-                                        id='edit-surname'
-                                        required
-                                        defaultValue={
-                                          editedStudent?.surname ?? ''
-                                        }
-                                      />
-                                    </div>
-                                    <div className='space-y-2'>
-                                      <Label htmlFor='edit-name'>Имя *</Label>
-                                      <Input
-                                        id='edit-name'
-                                        required
-                                        defaultValue={editedStudent?.name ?? ''}
-                                      />
-                                    </div>
-                                  </div>
-
-                                  <div className='space-y-2'>
-                                    <Label htmlFor='edit-middlename'>
-                                      Отчество
-                                    </Label>
-                                    <Input
-                                      id='edit-middlename'
-                                      defaultValue={
-                                        editedStudent?.middlename ?? ''
-                                      }
-                                    />
-                                  </div>
-
-                                  <div className='grid grid-cols-2 gap-4'>
-                                    <div className='space-y-2'>
-                                      <Label htmlFor='edit-email'>
-                                        Email *
-                                      </Label>
-                                      <Input
-                                        id='edit-email'
-                                        type='email'
-                                        required
-                                        defaultValue={
-                                          editedStudent?.email ?? ''
-                                        }
-                                      />
-                                    </div>
-                                    <div className='space-y-2'>
-                                      <Label htmlFor='edit-phone'>
-                                        Телефон
-                                      </Label>
-                                      <Input
-                                        id='edit-phone'
-                                        placeholder='+7 (999) 123-45-67'
-                                        defaultValue={
-                                          editedStudent?.phone ?? ''
-                                        }
-                                      />
-                                    </div>
-                                  </div>
-
-                                  <div className='grid grid-cols-2 gap-4'>
-                                    <div className='space-y-2'>
-                                      <Label htmlFor='edit-status'>
-                                        Статус
-                                      </Label>
-                                      <Select
-                                        defaultValue={editedStudent?.status}
-                                      >
-                                        <SelectTrigger>
-                                          <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value='InProcess'>
-                                            Обучается
-                                          </SelectItem>
-                                          <SelectItem value='OnAcademicLeave'>
-                                            Академический отпуск
-                                          </SelectItem>
-                                          <SelectItem value='Graduated'>
-                                            Выпускник
-                                          </SelectItem>
-                                          <SelectItem value='Expelled'>
-                                            Отчислен
-                                          </SelectItem>
-                                          <SelectItem value='Transfered'>
-                                            Переведен
-                                          </SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                    <div className='space-y-2'>
-                                      <Label htmlFor='edit-groupId'>
-                                        Номер группы
-                                      </Label>
-                                      <Input
-                                        id='edit-groupId'
-                                        placeholder='101'
-                                        defaultValue={
-                                          editedStudent?.groupNumber ?? ''
-                                        }
-                                      />
-                                    </div>
-                                  </div>
-
-                                  <div className='flex items-center space-x-2'>
-                                    <Checkbox id='edit-isHeadMan' />
-                                    <Label htmlFor='edit-isHeadMan'>
-                                      Староста группы
-                                    </Label>
-                                  </div>
-
-                                  <div className='flex justify-end space-x-2 pt-4'>
-                                    <Button type='submit'>
-                                      Сохранить изменения
-                                    </Button>
-                                  </div>
-                                </form>
-                              </DialogContent>
-                            </Dialog>
-                            <DropdownMenuItem className='text-red-600 focus:text-red-600'>
-                              <Trash2 className='mr-2 h-4 w-4' />
-                              Удалить
-                            </DropdownMenuItem>
                           </DropdownMenuContent>
+                          {/* <EditStudentModal studentId={student.id} />*/}
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
@@ -462,7 +388,7 @@ export const StudentsPage = () => {
                 </TableBody>
               </Table>
 
-              {filteredStudents?.length === 0 && (
+              {filteredStudents?.length === 0 && hasActiveFilter && (
                 <div className='text-center py-8 text-muted-foreground'>
                   {searchTerm
                     ? 'Студенты не найдены'
@@ -471,8 +397,8 @@ export const StudentsPage = () => {
               )}
             </CardContent>
           </Card>
-        </div>
-      </PageLayout>
+        )}
+      </div>
     </>
   );
 };

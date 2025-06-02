@@ -1,16 +1,16 @@
-import { IStudent, StudentStatus } from '@/entities/Student/models/types.ts';
+import { IStudent, StudentStatus } from '@/entities/Student';
 
 export const getStatusColor = (status: StudentStatus) => {
   switch (status) {
-    case 'InProcess':
+    case StudentStatus.InProcess:
       return 'bg-green-100 text-green-800 hover:bg-green-200';
-    case 'OnAcademicLeave':
+    case StudentStatus.OnAcademicLeave:
       return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200';
-    case 'Graduated':
+    case StudentStatus.Graduated:
       return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
-    case 'Expelled':
+    case StudentStatus.Expelled:
       return 'bg-red-100 text-red-800 hover:bg-red-200';
-    case 'Transfered':
+    case StudentStatus.Transferred:
       return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
     default:
       return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
@@ -19,15 +19,15 @@ export const getStatusColor = (status: StudentStatus) => {
 
 export const getStatusText = (status: StudentStatus) => {
   switch (status) {
-    case 'InProcess':
+    case StudentStatus.InProcess:
       return 'Обучается';
-    case 'OnAcademicLeave':
+    case StudentStatus.OnAcademicLeave:
       return 'Академический отпуск';
-    case 'Graduated':
+    case StudentStatus.Graduated:
       return 'Выпускник';
-    case 'Expelled':
+    case StudentStatus.Expelled:
       return 'Отчислен';
-    case 'Transfered':
+    case StudentStatus.Transferred:
       return 'Переведен';
     default:
       return status;
