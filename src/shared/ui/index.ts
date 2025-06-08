@@ -23,6 +23,8 @@ export {
 } from './sheet';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
 export { Badge, badgeVariants } from './badge.tsx';
+export { Textarea } from './textarea.tsx';
+export { Switch } from './switch.tsx';
 export {
   Dialog,
   DialogClose,
@@ -47,3 +49,14 @@ export {
   SelectTrigger,
   SelectValue,
 } from './select.tsx';
+export {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandShortcut,
+  CommandSeparator,
+} from './command.tsx'

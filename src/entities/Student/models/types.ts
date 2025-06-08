@@ -1,6 +1,6 @@
 import { IUser } from '@/entities/User';
 
-export enum StudentStatus {
+export enum EStudentStatus {
   Expelled = 'Expelled',
   OnAcademicLeave = 'OnAcademicLeave',
   InProcess = 'InProcess',
@@ -8,7 +8,7 @@ export enum StudentStatus {
   Graduated = 'Graduated',
 }
 
-export enum InternshipStatus {
+export enum EInternshipStatus {
   UnderSecondGrade = 'Small',
   InSearch = 'Candidate',
   GotInternship = 'Internship',
@@ -22,10 +22,10 @@ export interface IStudent {
   email: string;
   phone: string;
   isHeadMan: boolean;
-  status: StudentStatus;
+  status: EStudentStatus;
   groupNumber: number;
   course: number;
-  internshipStatus: InternshipStatus;
+  internshipStatus: EInternshipStatus;
 }
 
 export interface EditStudentGroupDTO {
@@ -45,12 +45,12 @@ export interface EditStudentDTO {
 
 export interface EditStudentInternshipStatusDTO {
   id: string;
-  internshipStatus: InternshipStatus;
+  internshipStatus: EInternshipStatus;
 }
 
 export interface EditStudentStatusDTO {
   studentId: string;
-  status: StudentStatus;
+  status: EStudentStatus;
 }
 
 export interface CreateStudentDTO {
@@ -60,7 +60,7 @@ export interface CreateStudentDTO {
   middlename: string;
   phone: string;
   isHeadMan: boolean;
-  status: StudentStatus;
-  internshipStatus: InternshipStatus;
+  status: EStudentStatus;
+  internshipStatus: EInternshipStatus;
   groupId: string;
 }

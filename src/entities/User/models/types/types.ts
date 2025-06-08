@@ -1,3 +1,5 @@
+import { EStudentStatus } from '@/entities/Student';
+
 export interface ILoginData {
   phone: string;
   password: string;
@@ -7,14 +9,7 @@ export interface ILoginData {
   password: string;
 }
 
-export type TStudentStatus =
-  | 'Expelled'
-  | 'OnAcademicLeave'
-  | 'InProcess'
-  | 'Transfered'
-  | 'Graduated';
-
-export type TInternshipStatus = 'Small' | 'Candidate' | 'Intern';
+export type TUserInternshipStatus = 'Small' | 'Candidate' | 'Intern';
 
 export enum UserRole {
   Student = 'Student',
@@ -27,16 +22,22 @@ export interface IUser {
   surname: string;
   email: string;
 }
-export interface IStudent {
+export interface IDeanMember extends IUser {
   id: string;
-  name: string;
-  surname: string;
-  email: string;
+  isDeleted: boolean;
+}
+export interface ICurator extends IUser {
+  id: string;
+  telegram: string;
+  phone: string;
+}
+export interface IStudent extends IUser {
+  id: string;
   middlename: string;
   phone: string;
   isHeadMan: string;
-  status: TStudentStatus;
-  internshipStatus: TInternshipStatus;
+  status: EStudentStatus;
+  internshipStatus: TUserInternshipStatus;
   groupNumber: number;
   course: number;
 }

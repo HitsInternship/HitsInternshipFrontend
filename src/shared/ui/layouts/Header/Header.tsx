@@ -9,11 +9,17 @@ import { Sheet, SheetContent, SheetTrigger } from '../../sheet';
 import { HeaderItems } from './Header.constants';
 
 import { useStores } from '@/shared/contexts';
+import { useLogout } from '@/entities/User/hooks';
 
 export const Header = observer(() => {
   const {
     userStore: { roles: userRoles },
   } = useStores();
+
+  const { mutate } = useLogout();
+  const handleLogoutClick = ():void => {
+    mutate()
+  }
 
   const links = HeaderItems.map(
     ({ name, link, roles }): ReactElement | undefined => {
@@ -53,7 +59,7 @@ export const Header = observer(() => {
             {/* Здесь можно добавить поиск или другие элементы */}
           </div>
           <nav className='flex items-center'>
-            <Button variant='outline' className='mr-2'>
+            <Button variant='outline' className='mr-2' onClick={handleLogoutClick}>
               Выйти
             </Button>
           </nav>
@@ -88,14 +94,6 @@ const MobileNav = ({ links }: { links: (ReactElement | undefined)[] }) => {
         </nav>
       </div>
       {links}
-      <div className='mt-4 pt-4 border-t'>
-        <Link
-          to='#'
-          className='text-foreground/80 transition-colors hover:text-foreground'
-        >
-          Выйти
-        </Link>
-      </div>
     </div>
   );
 };

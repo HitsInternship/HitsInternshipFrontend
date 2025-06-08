@@ -30,7 +30,7 @@ import {
   FormMessage,
 } from '@/shared/ui/form';
 import { useGroups } from '@/entities/Groups';
-import { CreateStudentDTO, InternshipStatus } from '@/entities/Student';
+import { CreateStudentDTO, EInternshipStatus } from '@/entities/Student';
 import { useCreateStudent } from '@/entities/Student';
 
 export const CreateStudentModal = () => {
@@ -74,7 +74,7 @@ export const CreateStudentModal = () => {
       phone: data.phone,
       isHeadMan: data.isHeadMan,
       status: data.status,
-      internshipStatus: InternshipStatus.InSearch,
+      internshipStatus: EInternshipStatus.InSearch,
       groupId: data.groupId,
     };
     mutate({ params: dto });

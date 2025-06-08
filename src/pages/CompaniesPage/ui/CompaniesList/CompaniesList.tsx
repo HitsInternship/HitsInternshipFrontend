@@ -1,6 +1,5 @@
 import { Edit2Icon, UsersIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
@@ -15,21 +14,21 @@ import {
   CardTitle,
 } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
-import { getCompanies } from '@/entities/Company/api';
 import { useStores } from '@/shared/contexts';
 import { ROUTER_PATHS } from '@/shared/consts';
 import { CompanyStatusBadge } from '@/shared/components/CompanyStatusBadge';
+import { UserRole } from '@/entities/User/models';
+import { useCompaniesList } from '@/entities/Company';
 
 export const CompaniesList = observer(() => {
   const {
     companyStore: { setCompanies, companies },
+    userStore: { roles },
   } = useStores();
 
-  const { data, isLoading } = useQuery({
-    queryFn: () => getCompanies({}),
-    queryKey: ['companies'],
-    select: (data) => data.data,
-  });
+  const isStudent = roles.includes(UserRole.Student);
+
+  const { data, isLoading } = useCompaniesList();
 
   useEffect(() => {
     if (data !== undefined) {
@@ -75,12 +74,14 @@ export const CompaniesList = observer(() => {
                 Подробнее
               </Link>
             </Button>
-            <Button variant='outline' asChild>
-              <Link to={ROUTER_PATHS.EDIT_COMPANY(company.id)}>
-                <Edit2Icon className='mr-2 h-4 w-4' />
-                Редактировать
-              </Link>
-            </Button>
+            {!isStudent && (
+              <Button variant='outline' asChild>
+                <Link to={ROUTER_PATHS.EDIT_COMPANY(company.id)}>
+                  <Edit2Icon className='mr-2 h-4 w-4' />
+                  Редактировать
+                </Link>
+              </Button>
+            )}
           </CardFooter>
         </Card>
       ))}

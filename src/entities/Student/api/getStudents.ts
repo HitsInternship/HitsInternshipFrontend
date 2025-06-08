@@ -1,5 +1,7 @@
+import { EInternshipStatus } from '../models/types';
+
 import { api, RequestConfig } from '@/shared/api';
-import { IStudent } from '@/entities/Student';
+import { EStudentStatus, IStudent } from '@/entities/Student';
 
 export type GetStudentsConfig = RequestConfig;
 export const getStudents = ({ config }: GetStudentsConfig) =>
@@ -14,9 +16,10 @@ const mockStudents: IStudent[] = [
     email: 'ivan.petrov@example.com',
     phone: '+7 (999) 123-45-67',
     isHeadMan: true,
-    status: 'InProcess',
+    status: EStudentStatus.InProcess,
     groupNumber: 101,
     course: 2,
+    internshipStatus: EInternshipStatus.UnderSecondGrade,
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440002',
@@ -26,9 +29,10 @@ const mockStudents: IStudent[] = [
     email: 'maria.ivanova@example.com',
     phone: '+7 (999) 234-56-78',
     isHeadMan: false,
-    status: 'InProcess',
+    status: EStudentStatus.InProcess,
     groupNumber: 101,
     course: 2,
+    internshipStatus: EInternshipStatus.UnderSecondGrade,
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440003',
@@ -38,9 +42,10 @@ const mockStudents: IStudent[] = [
     email: 'alexey.sidorov@example.com',
     phone: '+7 (999) 345-67-89',
     isHeadMan: false,
-    status: 'OnAcademicLeave',
+    status: EStudentStatus.OnAcademicLeave,
     groupNumber: 102,
     course: 3,
+    internshipStatus: EInternshipStatus.InSearch,
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440004',
@@ -50,9 +55,10 @@ const mockStudents: IStudent[] = [
     email: 'elena.kozlova@example.com',
     phone: '+7 (999) 456-78-90',
     isHeadMan: false,
-    status: 'Graduated',
+    status: EStudentStatus.Graduated,
     groupNumber: 103,
     course: 4,
+    internshipStatus: EInternshipStatus.GotInternship,
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440005',
@@ -62,9 +68,10 @@ const mockStudents: IStudent[] = [
     email: 'dmitry.morozov@example.com',
     phone: '+7 (999) 567-89-01',
     isHeadMan: false,
-    status: 'Expelled',
+    status: EStudentStatus.Expelled,
     groupNumber: 104,
     course: 1,
+    internshipStatus: EInternshipStatus.UnderSecondGrade,
   },
 ];
 

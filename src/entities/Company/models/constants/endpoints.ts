@@ -1,4 +1,4 @@
-import { CompanyStatus } from '@/entities/Company/models';
+import { ECompanyStatus } from '@/entities/Company/models';
 
 export const BASE_COMPANIES_URL = '/api/companies';
 
@@ -9,7 +9,7 @@ export const COMPANY_ENDPOINTS = {
   EDIT_COMPANY: (companyId: string) => `${BASE_COMPANIES_URL}/${companyId}`,
   ADD_PARTNERSHIP_AGREEMENT: (companyId: string) =>
     `${BASE_COMPANIES_URL}/${companyId}/agreements/add`,
-  CHANGE_COMPANY_STATUS: (companyId: string, status: CompanyStatus) =>
+  CHANGE_COMPANY_STATUS: (companyId: string, status: ECompanyStatus) =>
     `${BASE_COMPANIES_URL}/${companyId}/status?companyStatus=${status}`,
   ADD_COMPANY_REPRESENTATIVE: (companyId: string) =>
     `${BASE_COMPANIES_URL}/${companyId}/persons/add`,

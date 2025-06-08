@@ -1,6 +1,6 @@
 import { CompanyFormValues } from '../model';
 
-import { CompanyStatus } from '@/entities/Company/models';
+import { ECompanyStatus } from '@/entities/Company/models';
 
 export interface IEditCompanyParams {
   companyId: string;
@@ -8,6 +8,6 @@ export interface IEditCompanyParams {
 }
 
 export interface IEditCompanyStatus {
-  status: CompanyStatus;
+  status: ECompanyStatus;
   companyId: string;
 }
