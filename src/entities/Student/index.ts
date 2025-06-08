@@ -6,7 +6,8 @@ export type {
   EditStudentStatusDTO,
   CreateStudentDTO,
 } from './models';
-export { InternshipStatus, StudentStatus } from './models';
+export { EInternshipStatus, EStudentStatus } from './models';
+export { getStatusColor, getStatusText } from './utils';
 export {
   useStudentProfile,
   useStudentsByGroup,

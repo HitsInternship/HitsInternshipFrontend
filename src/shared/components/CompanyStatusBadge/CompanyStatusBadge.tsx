@@ -1,8 +1,8 @@
 import { Badge } from '@/shared/ui/badge';
-import { CompanyStatus } from '@/entities/Company/models/types/types.ts';
+import { ECompanyStatus } from '@/entities/Company/models/types/types.ts';
 
 export interface ICompanyStatusBadgeProps {
-  status: CompanyStatus;
+  status: ECompanyStatus;
 }
 
 export const CompanyStatusBadge = ({ status }: ICompanyStatusBadgeProps) => {
@@ -23,3 +23,4 @@ export const CompanyStatusBadge = ({ status }: ICompanyStatusBadgeProps) => {
       return null;
   }
 };
+

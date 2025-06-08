@@ -1,6 +1,7 @@
 import { SetStateAction } from 'react';
 
-import { Group, Stream } from '@/features/StreamsCRUD/model/types';
+import { Stream } from '@/features/StreamsCRUD/model/types';
+import { Group } from '@/entities/Groups';
 
 export interface GroupDialogProps {
   isGroupDialogOpen: boolean;

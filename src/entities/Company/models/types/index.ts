@@ -1,1 +1,1 @@
-export type { Company, CompanyStatus } from './types';
+export { type Company, ECompanyStatus } from './types';

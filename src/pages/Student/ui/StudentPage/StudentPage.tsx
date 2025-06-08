@@ -10,11 +10,7 @@ import {
   FilterX,
 } from 'lucide-react';
 
-import {
-  getFullName,
-  getStatusColor,
-  getStatusText,
-} from './StudentPage.utils';
+import { getFullName } from './StudentPage.utils';
 import { CreateStudentModal } from '../CreateStudentModal';
 
 import { Button } from '@/shared/ui/button';
@@ -43,11 +39,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select';
-import { Label } from '@/shared/ui';
+import { Label, PageLayout } from '@/shared/ui';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { useStreams } from '@/features/StreamsCRUD/hooks';
 import { useGroups } from '@/entities/Groups';
-import { useStudentsByGroup, useStudentsByStream } from '@/entities/Student';
+import {
+  getStatusColor,
+  getStatusText,
+  useStudentsByGroup,
+  useStudentsByStream,
+} from '@/entities/Student';
 
 export const StudentsPage = () => {
   const [selectedStreamId, setSelectedStreamId] = useState('');
@@ -114,15 +115,9 @@ export const StudentsPage = () => {
   const hasActiveFilter = selectedStreamId || selectedGroupId;
 
   return (
-    <>
+    <PageLayout title='Студенты' subTitle=' Управление студентами и их данными'>
       <div className='container mx-auto py-6 space-y-6'>
-        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
-          <div>
-            <h1 className='text-3xl font-bold tracking-tight'>Студенты</h1>
-            <p className='text-muted-foreground'>
-              Управление студентами и их данными
-            </p>
-          </div>
+        <div className='flex flex-col sm:flex-row justify-end gap-4'>
           <CreateStudentModal />
         </div>
 
@@ -399,6 +394,6 @@ export const StudentsPage = () => {
           </Card>
         )}
       </div>
-    </>
+    </PageLayout>
   );
 };

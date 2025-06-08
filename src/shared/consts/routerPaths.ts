@@ -10,4 +10,7 @@ export const ROUTER_PATHS = {
   CREATE_COMPANY_PERSON: '/companies/new-person',
   SEMESTER_STREAM_GROUP: '/semester-stream-group',
   STUDENTS: '/students',
+  VACANCIES: '/vacancies',
+  VACANCY: (id: string) => `/vacancy/${id}`,
+  CHANGE_PRACTICE: '/change-practice',
 };

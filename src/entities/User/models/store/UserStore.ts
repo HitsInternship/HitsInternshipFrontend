@@ -7,6 +7,7 @@ export class UserStore {
   name?: string;
   roles: UserRole[] = [];
   isAuthorized: boolean = false;
+  isHydrated: boolean = false;
 
   constructor() {
     makeAutoObservable(this);

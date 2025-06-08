@@ -188,15 +188,13 @@ export const CreateStudentDialog = ({
                     <SelectValue placeholder='Выберите статус' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='InProcess'>
-                      В процессе обучения
-                    </SelectItem>
+                    <SelectItem value='InProcess'>Обучается</SelectItem>
                     <SelectItem value='OnAcademicLeave'>
-                      В академическом отпуске
+                      Академический отпуск
                     </SelectItem>
-                    <SelectItem value='Transfered'>Переведен</SelectItem>
                     <SelectItem value='Graduated'>Выпускник</SelectItem>
                     <SelectItem value='Expelled'>Отчислен</SelectItem>
+                    <SelectItem value='Transfered'>Переведен</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

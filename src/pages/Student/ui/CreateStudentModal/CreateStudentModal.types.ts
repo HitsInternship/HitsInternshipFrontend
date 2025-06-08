@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-import { StudentStatus } from '@/entities/Student';
+import { EStudentStatus } from '@/entities/Student';
 
 export const studentSchema = z.object({
   surname: z.string().min(1, 'Фамилия обязательна'),
@@ -8,7 +8,7 @@ export const studentSchema = z.object({
   middlename: z.string().optional(),
   email: z.string().email('Некорректный email').min(1, 'Email обязателен'),
   phone: z.string().min(1, 'Номер телефона обязателен'),
-  status: z.nativeEnum(StudentStatus),
+  status: z.nativeEnum(EStudentStatus),
   groupId: z.string(),
   isHeadMan: z.boolean(),
 });

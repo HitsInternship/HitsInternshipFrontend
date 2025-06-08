@@ -6,4 +6,4 @@ export type {
   EditStudentStatusDTO,
   CreateStudentDTO,
 } from './types';
-export { StudentStatus, InternshipStatus } from './types';
+export { EStudentStatus, EInternshipStatus } from './types';

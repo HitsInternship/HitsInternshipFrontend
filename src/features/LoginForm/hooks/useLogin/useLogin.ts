@@ -15,6 +15,7 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: login,
+
     onSuccess: (response) => {
       toast.success('Авторизация прошла успешно!');
       localStorage.setItem('accessToken', response.data.token.accessToken);

@@ -22,7 +22,7 @@ export interface Group {
   id: string;
   groupNumber: number;
   streamId: string;
-  students: Student[];
+  students?: Student[];
 }
 
 export interface CreateGroupDto {

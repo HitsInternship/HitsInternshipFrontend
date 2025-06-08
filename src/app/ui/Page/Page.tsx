@@ -13,6 +13,9 @@ import { EditCompanyPage } from '@/pages/EditCompanyPage';
 import { AddCompanyPersonPage } from '@/pages/AddCompanyRepresentativePage';
 import { SemesterStreamsGroupsPage } from '@/pages/SemesterStreamsGroupsPage';
 import { StudentsPage } from '@/pages/Student';
+import { VacanciesPage } from '@/pages/VacanciesPage';
+import { VacancyPage } from '@/pages/VacancyPage';
+import { ChangePracticePage } from '@/pages/ChangePracticePage';
 
 export const Page: FC = observer(() => {
   return (
@@ -43,6 +46,12 @@ export const Page: FC = observer(() => {
           element={<AddCompanyPersonPage />}
         />
         <Route path={ROUTER_PATHS.STUDENTS} element={<StudentsPage />} />
+        <Route path={ROUTER_PATHS.VACANCIES} element={<VacanciesPage />} />
+        <Route path={ROUTER_PATHS.VACANCY(':id')} element={<VacancyPage />} />
+        <Route
+          path={ROUTER_PATHS.CHANGE_PRACTICE}
+          element={<ChangePracticePage />}
+        />
       </Route>
     </Routes>
   );

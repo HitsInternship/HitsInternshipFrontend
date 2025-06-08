@@ -1,22 +1,46 @@
 import { Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ReactElement } from 'react';
+import { observer } from 'mobx-react-lite';
 
 import { Button } from '../../button';
 import icon from '../../assets/header-icon.gif';
 import { Sheet, SheetContent, SheetTrigger } from '../../sheet';
 import { HeaderItems } from './Header.constants';
 
-const links = HeaderItems.map(({ name, link }) => (
-  <Link
-    to={link}
-    className='transition-colors hover:text-foreground/80 text-foreground'
-    key={name}
-  >
-    {name}
-  </Link>
-));
+import { useStores } from '@/shared/contexts';
+import { useLogout } from '@/entities/User/hooks';
 
-export const Header = () => {
+export const Header = observer(() => {
+  const {
+    userStore: { roles: userRoles },
+  } = useStores();
+
+  const { mutate } = useLogout();
+  const handleLogoutClick = ():void => {
+    mutate()
+  }
+
+  const links = HeaderItems.map(
+    ({ name, link, roles }): ReactElement | undefined => {
+      const hasAccess = Array.from(roles).some((role) =>
+        userRoles.includes(role),
+      );
+
+      if (hasAccess) {
+        return (
+          <Link
+            to={link}
+            className='transition-colors hover:text-foreground/80 text-foreground'
+            key={name}
+          >
+            {name}
+          </Link>
+        );
+      }
+    },
+  );
+
   return (
     <header className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
       <div className='container flex h-14 items-center mx-auto'>
@@ -35,7 +59,7 @@ export const Header = () => {
             {/* Здесь можно добавить поиск или другие элементы */}
           </div>
           <nav className='flex items-center'>
-            <Button variant='outline' className='mr-2'>
+            <Button variant='outline' className='mr-2' onClick={handleLogoutClick}>
               Выйти
             </Button>
           </nav>
@@ -51,16 +75,16 @@ export const Header = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side='left' className='pr-0'>
-              <MobileNav />
+              <MobileNav links={links} />
             </SheetContent>
           </Sheet>
         </div>
       </div>
     </header>
   );
-};
+});
 
-const MobileNav = () => {
+const MobileNav = ({ links }: { links: (ReactElement | undefined)[] }) => {
   return (
     <div className='flex flex-col space-y-3 pt-6 ml-6'>
       <div>
@@ -70,14 +94,6 @@ const MobileNav = () => {
         </nav>
       </div>
       {links}
-      <div className='mt-4 pt-4 border-t'>
-        <Link
-          to='#'
-          className='text-foreground/80 transition-colors hover:text-foreground'
-        >
-          Выйти
-        </Link>
-      </div>
     </div>
   );
 };
