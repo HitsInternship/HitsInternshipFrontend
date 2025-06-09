@@ -3,7 +3,7 @@ import { SelectionStatus } from '@/entities/Selection';
 
 export type CreateSelectionCommentsConfig = RequestConfig<{
   content: string;
-  selectionStatus: SelectionStatus;
+  selectionStatus: SelectionStatus | null;
 }>;
 
 export const createSelectionComment = ({
