@@ -78,6 +78,7 @@ export default tseslint.config(
         { namedComponents: 'arrow-function' },
       ],
       'react/self-closing-comp': ['error', { component: true, html: true }],
+      '@tanstack/query/exhaustive-deps': 'off',
     },
   },
 );

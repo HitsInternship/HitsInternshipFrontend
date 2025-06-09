@@ -43,4 +43,9 @@ export const HeaderItems: IHeaderItem[] = [
     link: ROUTER_PATHS.CHANGE_PRACTICE,
     roles: [ UserRole.DeanMember],
   },
+  {
+    name: 'Отборы',
+    link: ROUTER_PATHS.SELECTIONS,
+    roles: [ UserRole.DeanMember, UserRole.Curator],
+  }
 ];

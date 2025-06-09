@@ -13,4 +13,5 @@ export const ROUTER_PATHS = {
   VACANCIES: '/vacancies',
   VACANCY: (id: string) => `/vacancy/${id}`,
   CHANGE_PRACTICE: '/change-practice',
+  SELECTIONS: '/selections',
 };

@@ -1,0 +1,1 @@
+export { MassCommentType } from './types';
