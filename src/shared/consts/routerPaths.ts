@@ -2,7 +2,7 @@ export const ROUTER_PATHS = {
   HOME: '/',
   LOGIN: '/login',
   PROFILE: '/profile',
-  INTERNSHIP: '/internship',
+  // INTERNSHIP: '/internship',
   COMPANIES: '/companies',
   COMPANY: (id: string) => `/companies/${id}`,
   EDIT_COMPANY: (id: string) => `/companies/${id}/edit`,

@@ -26,6 +26,7 @@ import { CreateVacancyFormData, useCreateVacancy } from '@/entities/Vacancy';
 export const CreateVacancyDialog = ({
   open,
   onOpenChange,
+  onSuccess,
 }: CreateVacancyDialogProps) => {
   const { data: companies } = useCompaniesList();
   const { data: positions } = usePositions();
@@ -71,7 +72,7 @@ export const CreateVacancyDialog = ({
       return;
     }
 
-    mutate(formData);
+    mutate(formData, { onSuccess: () => onSuccess() });
 
     resetForm();
     onOpenChange(false);

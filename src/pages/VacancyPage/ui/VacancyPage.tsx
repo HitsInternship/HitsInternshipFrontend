@@ -1,6 +1,14 @@
 import { ReactElement, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Archive, Briefcase, Building, Edit, Trash2 } from 'lucide-react';
+import {
+  Archive,
+  Briefcase,
+  Building,
+  Edit,
+  Trash2,
+  Bell,
+  Loader,
+} from 'lucide-react';
 
 import { StatusBadge } from './StatusBadge';
 
@@ -18,11 +26,13 @@ import { useStores } from '@/shared/contexts';
 import { UserRole } from '@/entities/User/models';
 import { DeleteConfirmationDialog } from '@/widgets/DeleteConfirmationDialog';
 import { EditVacancyDialog } from '@/features/EditVacancyDialog';
+import { useRespondVacancy } from '@/entities/VacancyResponse';
 
 export const VacancyPage = (): ReactElement => {
   const { id } = useParams();
-  const { data } = useVacancyInfo(id!);
+  const { data, status } = useVacancyInfo(id!);
   const { mutate } = useDeleteVacancy();
+  const { mutate: respond } = useRespondVacancy(id!);
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -36,6 +46,7 @@ export const VacancyPage = (): ReactElement => {
 
   const canControl =
     roles.includes(UserRole.Curator) || roles.includes(UserRole.DeanMember);
+  const isStudent = roles.includes(UserRole.Student);
 
   const subTitle = (
     <div className='flex items-center gap-2 justify-center'>
@@ -57,31 +68,33 @@ export const VacancyPage = (): ReactElement => {
     console.log('Архивация вакансии:', data?.id);
     mutate({ isArchive: true, id: id! });
   };
+  const handleRespondVacancy = () => {
+    respond(id!);
+  };
 
+  if (status === 'pending') {
+    return (
+      <PageLayout>
+        <Loader className='mx-auto' />
+      </PageLayout>
+    );
+  }
   return (
     <PageLayout title={data?.title} subTitle={subTitle}>
-      <div className='lg:col-span-2 space-y-6'>
+      <div className='lg:col-span-2 space-y-4'>
         {canControl && (
           <div className='flex flex-wrap gap-2'>
             <Button variant='outline' onClick={handleEditVacancy}>
               <Edit className='mr-2 h-4 w-4' />
               Редактировать
             </Button>
-            {!isArchived ? (
+            {!isArchived && (
               <Button
                 variant='secondary'
                 onClick={() => setIsArchiveDialogOpen(true)}
               >
                 <Archive className='mr-2 h-4 w-4' />
                 Архивировать
-              </Button>
-            ) : (
-              <Button
-                variant='outline'
-                onClick={() => alert('Вакансия восстановлена из архива')}
-              >
-                <Archive className='mr-2 h-4 w-4' />
-                Восстановить
               </Button>
             )}
             <Button
@@ -92,6 +105,12 @@ export const VacancyPage = (): ReactElement => {
               Удалить
             </Button>
           </div>
+        )}
+        {!data?.hasResponse && isStudent && (
+          <Button variant='secondary' onClick={handleRespondVacancy}>
+            <Bell className='mr-2 h-4 w-4' />
+            Откликнуться
+          </Button>
         )}
         <div className='flex items-center gap-2'>
           {data?.isDeleted && <StatusBadge status='deleted' />}

@@ -3,11 +3,10 @@ import { IPosition } from '@/entities/Position';
 import { IStudent } from '@/entities/Student';
 
 export enum EApplicationStatus {
-  Created,
-  UnderConsideration,
-  Rejected,
-  Accepted,
-  null,
+  Created = 'Created',
+  UnderConsideration = 'UnderConsideration',
+  Rejected = 'Rejected',
+  Accepted = 'Accepted',
 }
 
 export interface IApplication {
@@ -18,6 +17,12 @@ export interface IApplication {
   student: IStudent;
   company: Company;
   position: IPosition;
+}
+
+export interface IApplicationDetails
+  extends Omit<IApplication, 'id' | 'isDeleted'> {
+  description: string;
+  documentUrl: string;
 }
 
 export interface ApplicationListResponse {

@@ -1,1 +1,5 @@
-export type { IApplication, ApplicationListResponse } from './types';
+export type {
+  IApplication,
+  ApplicationListResponse,
+  IApplicationDetails,
+} from './types';

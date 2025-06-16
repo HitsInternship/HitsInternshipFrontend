@@ -11,32 +11,27 @@ import {
   Input,
   Label,
 } from '@/shared/ui';
+import { IUser } from '@/entities/User';
+import { useCreateDeanMember } from '@/entities/User/hooks';
 
 interface CreateEmployeeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-// Тип для данных сотрудника
-interface EmployeeFormData {
-  lastName: string;
-  firstName: string;
-  middleName: string;
-  email: string;
-}
-
 export const CreateEmployeeDialog = ({
   open,
   onOpenChange,
 }: CreateEmployeeDialogProps) => {
-  const [formData, setFormData] = useState<EmployeeFormData>({
-    lastName: '',
-    firstName: '',
-    middleName: '',
+  const [formData, setFormData] = useState<IUser>({
+    name: '',
+    surname: '',
     email: '',
   });
 
-  const handleInputChange = (field: keyof EmployeeFormData, value: string) => {
+  const { mutate } = useCreateDeanMember();
+
+  const handleInputChange = (field: keyof IUser, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -45,9 +40,8 @@ export const CreateEmployeeDialog = ({
 
   const resetForm = () => {
     setFormData({
-      lastName: '',
-      firstName: '',
-      middleName: '',
+      name: '',
+      surname: '',
       email: '',
     });
   };
@@ -55,12 +49,12 @@ export const CreateEmployeeDialog = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.lastName || !formData.firstName || !formData.email) {
+    if (!formData.name || !formData.surname || !formData.email) {
       alert('Пожалуйста, заполните все обязательные поля');
       return;
     }
 
-    console.log('Данные сотрудника:', formData);
+    mutate(formData);
 
     resetForm();
     onOpenChange(false);
@@ -85,42 +79,24 @@ export const CreateEmployeeDialog = ({
         <form onSubmit={handleSubmit}>
           <div className='grid gap-4 py-4'>
             {/* ФИО */}
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-              <div className='space-y-2'>
-                <Label htmlFor='lastName'>Фамилия *</Label>
-                <Input
-                  id='lastName'
-                  placeholder='Введите фамилию'
-                  value={formData.lastName}
-                  onChange={(e) =>
-                    handleInputChange('lastName', e.target.value)
-                  }
-                  required
-                />
-              </div>
-              <div className='space-y-2'>
-                <Label htmlFor='firstName'>Имя *</Label>
-                <Input
-                  id='firstName'
-                  placeholder='Введите имя'
-                  value={formData.firstName}
-                  onChange={(e) =>
-                    handleInputChange('firstName', e.target.value)
-                  }
-                  required
-                />
-              </div>
-            </div>
-
             <div className='space-y-2'>
-              <Label htmlFor='middleName'>Отчество</Label>
+              <Label htmlFor='surname'>Фамилия *</Label>
               <Input
-                id='middleName'
-                placeholder='Введите отчество'
-                value={formData.middleName}
-                onChange={(e) =>
-                  handleInputChange('middleName', e.target.value)
-                }
+                id='surname'
+                placeholder='Введите фамилию'
+                value={formData.surname}
+                onChange={(e) => handleInputChange('surname', e.target.value)}
+                required
+              />
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='name'>Имя *</Label>
+              <Input
+                id='name'
+                placeholder='Введите имя'
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                required
               />
             </div>
 
