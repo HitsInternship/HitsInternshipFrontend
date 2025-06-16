@@ -29,12 +29,12 @@ export const GroupDialog = ({
   const { mutateAsync: createGroupMutation } = useCreateGroup();
   const { mutateAsync: updateGroupMutation } = useUpdateGroup();
 
-  const [groupNumber, setGroupNumber] = useState(0);
+  const [groupNumber, setGroupNumber] = useState('');
   const [selectedStreamId, setSelectedStreamId] = useState('');
 
   useEffect(() => {
     if (currentGroup) {
-      setGroupNumber(currentGroup.groupNumber);
+      setGroupNumber(currentGroup.groupNumber.toString());
       setSelectedStreamId(currentGroup.streamId);
     }
   }, [currentGroup]);
@@ -43,9 +43,15 @@ export const GroupDialog = ({
     if (!selectedStreamId) return;
 
     if (currentGroup) {
-      await updateGroupMutation({ id: currentGroup.id, groupNumber });
+      await updateGroupMutation({
+        id: currentGroup.id,
+        groupNumber: Number(groupNumber),
+      });
     } else {
-      await createGroupMutation({ groupNumber, streamId: selectedStreamId });
+      await createGroupMutation({
+        groupNumber: Number(groupNumber),
+        streamId: selectedStreamId,
+      });
     }
 
     setIsGroupDialogOpen(false);
@@ -71,9 +77,13 @@ export const GroupDialog = ({
               id='groupNumber'
               type='number'
               value={groupNumber}
-              onChange={(e) =>
-                setGroupNumber(Number.parseInt(e.target.value) || 0)
-              }
+              onChange={(e) => {
+                const value = e.target.value;
+
+                if (/^\d*$/.test(value)) {
+                  setGroupNumber(value);
+                }
+              }}
               className='col-span-3'
             />
           </div>

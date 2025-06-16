@@ -47,7 +47,7 @@ export const ApplicationModal = ({
   const [statusUpdating, setStatusUpdating] = useState(false);
 
   // Функция для получения детальной информации о заявке
-  const fetchApplicationDetail = async (id: string) => {
+  const fetchApplicationDetail = async () => {
     setDetailLoading(true);
     // Здесь будет реальный API запрос
     // const response = await fetch(`/api/applications/${id}`)
@@ -110,6 +110,7 @@ export const ApplicationModal = ({
     if (applicationDetail) {
       setApplicationDetail({
         ...applicationDetail,
+
         status: newStatus as unknown as EApplicationStatus,
       });
     }
@@ -218,10 +219,7 @@ export const ApplicationModal = ({
 
     const config = statusConfig[status as keyof typeof statusConfig];
     return (
-      <Badge
-        variant={config?.variant || 'secondary'}
-        className={config?.className || ''}
-      >
+      <Badge variant={config?.variant || 'secondary'}>
         {config?.label || status}
       </Badge>
     );
@@ -240,7 +238,7 @@ export const ApplicationModal = ({
   // Загружаем данные при открытии модального окна
   useEffect(() => {
     if (isOpen && applicationId) {
-      fetchApplicationDetail(applicationId);
+      fetchApplicationDetail();
     } else {
       setApplicationDetail(null);
     }
