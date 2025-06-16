@@ -28,26 +28,26 @@ export const StreamDialog = ({
 }: StreamDialogProps) => {
   const { mutateAsync: createStreamMutation } = useCreateStream();
   const { mutateAsync: updateStreamMutation } = useUpdateStream();
-  const [streamNumber, setStreamNumber] = useState(0);
-  const [year, setYear] = useState(new Date().getFullYear());
+  const [streamNumber, setStreamNumber] = useState('');
+  const [year, setYear] = useState(new Date().getFullYear().toString());
   const [status, setStatus] = useState<Status>('Selection');
-  const [course, setCourse] = useState(0);
+  const [course, setCourse] = useState('');
 
   const handleSaveStream = () => {
     if (currentStream) {
       updateStreamMutation({
         id: currentStream.id,
-        streamNumber,
-        year,
+        streamNumber: Number(streamNumber),
+        year: Number(year),
         status,
-        course,
+        course: Number(course),
       });
     } else {
       createStreamMutation({
-        streamNumber,
-        year,
+        streamNumber: Number(streamNumber),
+        year: Number(year),
         status,
-        course,
+        course: Number(course),
       });
     }
 
@@ -56,10 +56,10 @@ export const StreamDialog = ({
 
   useEffect(() => {
     if (currentStream) {
-      setStreamNumber(currentStream.streamNumber);
-      setYear(currentStream.year);
+      setStreamNumber(currentStream.streamNumber.toString());
+      setYear(currentStream.year.toString());
       setStatus(currentStream.status);
-      setCourse(currentStream.course);
+      setCourse(currentStream.course.toString());
     }
   }, [currentStream]);
 
@@ -83,9 +83,12 @@ export const StreamDialog = ({
               id='streamNumber'
               type='number'
               value={streamNumber}
-              onChange={(e) =>
-                setStreamNumber(Number.parseInt(e.target.value) || 0)
-              }
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  setStreamNumber(value);
+                }
+              }}
               className='col-span-3'
             />
           </div>
@@ -97,11 +100,12 @@ export const StreamDialog = ({
               id='year'
               type='number'
               value={year}
-              onChange={(e) =>
-                setYear(
-                  Number.parseInt(e.target.value) || new Date().getFullYear(),
-                )
-              }
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  setYear(value);
+                }
+              }}
               className='col-span-3'
             />
           </div>
@@ -131,7 +135,12 @@ export const StreamDialog = ({
               id='course'
               type='number'
               value={course}
-              onChange={(e) => setCourse(Number.parseInt(e.target.value) || 0)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  setCourse(value);
+                }
+              }}
               className='col-span-3'
             />
           </div>

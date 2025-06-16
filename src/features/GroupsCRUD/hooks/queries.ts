@@ -1,10 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   createGroup,
   deleteGroup,
   updateGroup,
+  getGroupById,
 } from '@/features/GroupsCRUD/api';
+import { Group } from '@/entities/Groups';
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
@@ -36,5 +38,14 @@ export const useDeleteGroup = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
+  });
+};
+
+export const useGroup = (id: string) => {
+  return useQuery<Group>({
+    queryKey: ['groups', id],
+    queryFn: () => getGroupById(id),
+    enabled: !!id,
+    gcTime: 3 * 60 * 1000,
   });
 };
