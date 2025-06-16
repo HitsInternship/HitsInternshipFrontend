@@ -53,8 +53,8 @@ export const CreateSemesterDialog = ({
       });
     } else {
       await createSemesterMutation({
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
         description,
       });
     }

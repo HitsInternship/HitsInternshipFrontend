@@ -36,6 +36,7 @@ import {
   TableRow,
 } from '@/shared/ui/table';
 import { useDeleteGroup } from '@/features/GroupsCRUD/hooks';
+import { useStudentsByGroup } from '@/entities/Student';
 
 export const GroupItem = ({
   group,
@@ -50,6 +51,10 @@ export const GroupItem = ({
   const handleDeleteGroup = (id: string) => {
     deleteGroupMutation(id);
   };
+
+  const { data: fetchedStudents } = useStudentsByGroup(group.id);
+
+  const finalStudents = group.students ?? fetchedStudents;
 
   return (
     <Card className='w-full'>
@@ -68,7 +73,7 @@ export const GroupItem = ({
                   <CardDescription>
                     Поток: {streamInfo?.streamNumber || 'Неизвестно'} (
                     {streamInfo?.year || 'N/A'}) • Студентов:{' '}
-                    {group.students?.length}
+                    {finalStudents?.length}
                     {headMan && (
                       <>
                         {' '}
@@ -128,7 +133,7 @@ export const GroupItem = ({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <CardContent>
-            {group.students?.length === 0 ? (
+            {finalStudents?.length === 0 || !finalStudents ? (
               <div className='text-center py-8 text-muted-foreground'>
                 <Users className='mx-auto h-12 w-12 mb-4 opacity-50' />
                 <p>В группе пока нет студентов</p>
@@ -145,7 +150,7 @@ export const GroupItem = ({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {group.students?.map((student) => (
+                  {finalStudents?.map((student) => (
                     <StudentItem key={student.id} student={student} />
                   ))}
                 </TableBody>
