@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
-import { Filter, LoaderCircle } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+import { Filter, LoaderCircle, Send } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import {
   Candidate,
@@ -28,16 +29,43 @@ import {
   TableRow,
 } from '@/shared/ui/table';
 import { Checkbox } from '@/shared/ui/checkbox';
-import { Input } from '@/shared/ui';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Input,
+  Textarea,
+} from '@/shared/ui';
 import { MassSelectionComment } from '@/features/MassSelectionComment/ui';
 import { SelectionChatModal } from '@/features/SelectionChatModal';
+import { useCreateSelectionComment } from '@/features/MassSelectionComment/hooks/useCreateSelectionComment.ts';
+import { SelectionApproveModal } from '@/features/SelectionApproveModal';
+import { useStores } from '@/shared/contexts';
+import { cn } from '@/shared/lib/utils.ts';
 
 export const SelectionsPage = () => {
+  const {
+    selectionStore: { approvedSelections },
+  } = useStores();
+
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const [groupNumber, setGroupNumber] = useState<number | undefined>();
   const [status, setStatus] = useState<SelectionStatus | undefined>();
   const [company, setCompany] = useState<string | undefined>();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const massCommentTextarea = useRef<HTMLTextAreaElement | null>(null);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    if (massCommentTextarea.current) {
+      massCommentTextarea.current.value = '';
+    }
+  };
 
   const { data: selections = [], isLoading: selectionsLoading } = useSelections(
     { groupNumber: groupNumber, isArchive: false, status: status },
@@ -89,9 +117,34 @@ export const SelectionsPage = () => {
     }
   };
 
+  const { mutate, isPending } = useCreateSelectionComment({
+    onSuccess: () => {
+      toast.success('Комментарий успешно добавлен');
+    },
+    onError: () => {
+      toast.error('Проиошла ошибка');
+    },
+  });
+
+  const handleBulkSend = () => {
+    if (massCommentTextarea.current?.value) {
+      mutate({
+        params: {
+          selectedUsers: selectedIds,
+          content: massCommentTextarea.current?.value,
+        },
+      });
+    }
+  };
+
+  const onSendClick = () => {
+    handleBulkSend();
+    closeModal();
+  };
+
   if (isGroupsLoading || selectionsLoading) {
     return (
-      <div className='flex items-center justify-center h-full w-full'>
+      <div className='flex items-center justify-center h-[90vh] w-full'>
         <LoaderCircle className='h-8 w-8 animate-spin text-black-500 dark:text-gray-300' />
       </div>
     );
@@ -103,7 +156,51 @@ export const SelectionsPage = () => {
         <h1 className='text-3xl font-bold'>Отборы</h1>
         <div className='flex items-center gap-6'>
           <Badge variant='secondary'>Выбрано: {selectedIds.length}</Badge>
-          {selectedIds.length > 0 && <Button>Подтвердить отбор</Button>}
+          {selectedIds.length > 0 && (
+            <>
+              <Dialog
+                open={isModalOpen}
+                onOpenChange={(open) => {
+                  if (!open) {
+                    closeModal();
+                  }
+                }}
+              >
+                <DialogTrigger asChild>
+                  <Button
+                    variant='outline'
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    {isPending ? 'Отправка...' : 'Отправить'}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className='max-w-md'>
+                  <DialogHeader>
+                    <DialogTitle>Отправить сообщение</DialogTitle>
+                  </DialogHeader>
+
+                  <div className='space-y-4'>
+                    <Textarea
+                      ref={massCommentTextarea}
+                      placeholder='Введите сообщение...'
+                      rows={4}
+                      className='resize-none'
+                    />
+                  </div>
+
+                  <DialogFooter className='flex justify-end gap-2'>
+                    <Button variant='outline' onClick={closeModal}>
+                      Отмена
+                    </Button>
+                    <Button onClick={onSendClick}>
+                      <Send className='h-4 w-4 mr-2' />
+                      Отправить
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </>
+          )}
         </div>
       </div>
 
@@ -158,9 +255,15 @@ export const SelectionsPage = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='all'>Все статусы</SelectItem>
-                  <SelectItem value='Active'>Активный</SelectItem>
-                  <SelectItem value='Offer'>Предложение</SelectItem>
-                  <SelectItem value='Inactive'>Неактивный</SelectItem>
+                  <SelectItem value={SelectionStatus.InProgress}>
+                    Активный
+                  </SelectItem>
+                  <SelectItem value={SelectionStatus.OfferAccepted}>
+                    Оффер
+                  </SelectItem>
+                  <SelectItem value={SelectionStatus.Inactive}>
+                    Неактивный
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -207,6 +310,7 @@ export const SelectionsPage = () => {
                     <TableHead>Компания</TableHead>
                     <TableHead>Должность</TableHead>
                     <TableHead className='w-12' />
+                    <TableHead className='w-12' />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -223,6 +327,11 @@ export const SelectionsPage = () => {
                       <TableCell>{getFullName(selection.candidate)}</TableCell>
                       <TableCell>
                         <Badge
+                          className={cn({
+                            'text-green-600': approvedSelections.find(
+                              (id) => id === selection.id,
+                            ),
+                          })}
                           variant={getStatusBadgeVariant(
                             selection.selectionStatus,
                           )}
@@ -230,7 +339,7 @@ export const SelectionsPage = () => {
                           {selection.selectionStatus ===
                             SelectionStatus.InProgress && 'Активный'}
                           {selection.selectionStatus ===
-                            SelectionStatus.OfferAccepted && 'Предложение'}
+                            SelectionStatus.OfferAccepted && 'Оффер'}
                           {selection.selectionStatus ===
                             SelectionStatus.Inactive && 'Неактивный'}
                         </Badge>
@@ -243,6 +352,13 @@ export const SelectionsPage = () => {
                       </TableCell>
                       <TableCell>
                         <SelectionChatModal selectionId={selection.id} />
+                      </TableCell>
+                      <TableCell>
+                        {selection.selectionStatus ===
+                          SelectionStatus.OfferAccepted &&
+                          !approvedSelections.some(
+                            (id) => id === selection.id,
+                          ) && <SelectionApproveModal selection={selection} />}
                       </TableCell>
                     </TableRow>
                   ))}

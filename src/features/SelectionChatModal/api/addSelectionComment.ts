@@ -13,6 +13,6 @@ export const addSelectionComment = ({
 }: AddSelectionCommentConfig) =>
   api.post(
     `/api/selections/${params.selectionId}/comments`,
-    params.comment,
+    `"${params.comment}"`, // эндпоинт падает если передать не в ""
     config,
   );
