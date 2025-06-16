@@ -15,6 +15,7 @@ export interface IVacancyInfo {
   position: IPosition;
   company: Omit<Company, 'status'>;
   isClosed: boolean;
+  hasResponse: boolean;
   isDeleted: boolean;
 }
 export interface IVacancyList {
@@ -31,4 +32,12 @@ export interface CreateVacancyFormData {
   description: string;
   positionId: string;
   companyId: string;
+}
+
+export interface VacancyFilters {
+  positionId?: string;
+  companyId?: string;
+  page: number;
+  isClosed: boolean;
+  isArchived: boolean;
 }

@@ -6,7 +6,6 @@ import { ROUTER_PATHS } from '@/shared/consts';
 import { LoginPage } from '@/pages/LoginPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { MainLayout } from '@/shared/ui/layouts';
-import { InternshipPage } from '@/pages/InternshipPage';
 import { CompaniesPage } from '@/pages/CompaniesPage';
 import { CreateCompanyPage } from '@/pages/CreateCompanyPage';
 import { EditCompanyPage } from '@/pages/EditCompanyPage';
@@ -28,7 +27,7 @@ export const Page: FC = observer(() => {
       <Route path={ROUTER_PATHS.LOGIN} element={<LoginPage />} />
       <Route element={<MainLayout />}>
         <Route path={ROUTER_PATHS.PROFILE} element={<ProfilePage />} />
-        <Route path={ROUTER_PATHS.INTERNSHIP} element={<InternshipPage />} />
+        {/* <Route path={ROUTER_PATHS.INTERNSHIP} element={<InternshipPage />} /> */}
         <Route
           path={ROUTER_PATHS.SEMESTER_STREAM_GROUP}
           element={<SemesterStreamsGroupsPage />}

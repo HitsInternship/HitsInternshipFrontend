@@ -1,1 +1,5 @@
-export type { IApplication, ApplicationListResponse } from './models';
+export type {
+  IApplication,
+  ApplicationListResponse,
+  IApplicationDetails,
+} from './models';

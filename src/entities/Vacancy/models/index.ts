@@ -3,4 +3,5 @@ export type {
   IVacancyList,
   CreateVacancyFormData,
   IVacancyInfo,
+  VacancyFilters,
 } from './types';

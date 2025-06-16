@@ -13,11 +13,11 @@ export const HeaderItems: IHeaderItem[] = [
     link: ROUTER_PATHS.PROFILE,
     roles: [UserRole.Curator, UserRole.DeanMember, UserRole.Student],
   },
-  {
-    name: 'Стажировки',
-    link: ROUTER_PATHS.INTERNSHIP,
-    roles: [UserRole.Student],
-  },
+  // {
+  //   name: 'Стажировки',
+  //   link: ROUTER_PATHS.INTERNSHIP,
+  //   roles: [UserRole.Student],
+  // },
   {
     name: 'Группы',
     link: ROUTER_PATHS.SEMESTER_STREAM_GROUP,
