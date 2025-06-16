@@ -3,6 +3,7 @@ import {
   Download,
   FileText,
   MessageSquare,
+  Plus,
   Star,
   Upload,
 } from 'lucide-react';
@@ -30,6 +31,7 @@ import {
   AccordionTrigger,
 } from '@/shared/ui/accordion';
 import { Separator } from '@/shared/ui/separator';
+import { CreateApplicationModal } from '@/features/CreateApplicationModal/ui/CreateApplicationModal ';
 
 export const StudentPractice = () => {
   interface Practice {
@@ -92,6 +94,7 @@ export const StudentPractice = () => {
   };
 
   const [selectedComments, setSelectedComments] = useState<string[]>([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleFileUpload = (type: 'diary' | 'characteristic') => {
     // Имитация загрузки файла
@@ -106,12 +109,24 @@ export const StudentPractice = () => {
   };
   return (
     <>
-      <div className='mb-8'>
+      <div className='mb-4'>
         <h1 className='text-3xl font-bold mb-2'>Мои практики</h1>
         <p className='text-muted-foreground'>
           Управление документами и отслеживание прогресса по практикам
         </p>
       </div>
+      <Button
+        onClick={() => setShowCreateModal(true)}
+        className='flex items-center gap-2 mb-4'
+      >
+        <Plus className='h-4 w-4' />
+        Заявка на смену
+      </Button>
+
+      <CreateApplicationModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
 
       <Accordion type='single' collapsible className='space-y-4'>
         {practices.map((practice) => (
