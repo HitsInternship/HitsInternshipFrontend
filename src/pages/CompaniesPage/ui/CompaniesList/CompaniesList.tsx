@@ -1,4 +1,4 @@
-import { Edit2Icon, UsersIcon } from 'lucide-react';
+import { Edit2Icon, UsersIcon, FileDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
@@ -19,6 +19,7 @@ import { ROUTER_PATHS } from '@/shared/consts';
 import { CompanyStatusBadge } from '@/shared/components/CompanyStatusBadge';
 import { UserRole } from '@/entities/User/models';
 import { useCompaniesList } from '@/entities/Company';
+import { useDownloadInternsByCompany } from '@/entities/Practice/hooks/useDownloadInternsByCompany';
 
 export const CompaniesList = observer(() => {
   const {
@@ -27,8 +28,10 @@ export const CompaniesList = observer(() => {
   } = useStores();
 
   const isStudent = roles.includes(UserRole.Student);
+  const isDeanMember = roles.includes(UserRole.DeanMember);
 
   const { data, isLoading } = useCompaniesList();
+  const { mutate } = useDownloadInternsByCompany();
 
   useEffect(() => {
     if (data !== undefined) {
@@ -67,19 +70,29 @@ export const CompaniesList = observer(() => {
           <CardContent className='flex-grow'>
             {/* Место для доп контента (?) */}
           </CardContent>
-          <CardFooter className='flex justify-between pt-4 border-t'>
-            <Button variant='outline' asChild>
+          <CardFooter className='flex-col justify-between pt-4 border-t gap-2'>
+            <Button variant='outline' asChild className='w-full'>
               <Link to={`/companies/${company.id}`}>
                 <UsersIcon className='mr-2 h-4 w-4' />
                 Подробнее
               </Link>
             </Button>
             {!isStudent && (
-              <Button variant='outline' asChild>
+              <Button variant='outline' asChild className='w-full'>
                 <Link to={ROUTER_PATHS.EDIT_COMPANY(company.id)}>
                   <Edit2Icon className='mr-2 h-4 w-4' />
                   Редактировать
                 </Link>
+              </Button>
+            )}
+            {isDeanMember && (
+              <Button
+                variant='outline'
+                className='w-full'
+                onClick={() => mutate(company)}
+              >
+                <FileDown className='mr-2 h-4 w-4' />
+                Скачать практикантов
               </Button>
             )}
           </CardFooter>
