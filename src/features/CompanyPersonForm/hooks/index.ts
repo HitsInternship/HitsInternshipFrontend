@@ -1,1 +1,0 @@
-export { useCreateCompanyPerson } from './useCreateCompanyPerson';

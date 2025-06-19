@@ -23,7 +23,7 @@ export const CreateEmployeeDialog = ({
   open,
   onOpenChange,
 }: CreateEmployeeDialogProps) => {
-  const [formData, setFormData] = useState<IUser>({
+  const [formData, setFormData] = useState<Omit<IUser, 'id'>>({
     name: '',
     surname: '',
     email: '',

@@ -7,9 +7,6 @@ import { LoginPage } from '@/pages/LoginPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { MainLayout } from '@/shared/ui/layouts';
 import { CompaniesPage } from '@/pages/CompaniesPage';
-import { CreateCompanyPage } from '@/pages/CreateCompanyPage';
-import { EditCompanyPage } from '@/pages/EditCompanyPage';
-import { AddCompanyPersonPage } from '@/pages/AddCompanyRepresentativePage';
 import { SemesterStreamsGroupsPage } from '@/pages/SemesterStreamsGroupsPage';
 import { StudentsPage } from '@/pages/Student';
 import { VacanciesPage } from '@/pages/VacanciesPage';
@@ -34,18 +31,6 @@ export const Page: FC = observer(() => {
           element={<SemesterStreamsGroupsPage />}
         />
         <Route path={ROUTER_PATHS.COMPANIES} element={<CompaniesPage />} />
-        <Route
-          path={ROUTER_PATHS.CREATE_COMPANY}
-          element={<CreateCompanyPage />}
-        />
-        <Route
-          path={ROUTER_PATHS.EDIT_COMPANY(':id')}
-          element={<EditCompanyPage />}
-        />
-        <Route
-          path={ROUTER_PATHS.CREATE_COMPANY_PERSON}
-          element={<AddCompanyPersonPage />}
-        />
         <Route path={ROUTER_PATHS.STUDENTS} element={<StudentsPage />} />
         <Route path={ROUTER_PATHS.VACANCIES} element={<VacanciesPage />} />
         <Route path={ROUTER_PATHS.VACANCY(':id')} element={<VacancyPage />} />

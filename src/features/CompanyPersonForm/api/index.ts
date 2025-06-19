@@ -1,1 +1,0 @@
-export { addCompanyPerson } from './addCompanyPerson';

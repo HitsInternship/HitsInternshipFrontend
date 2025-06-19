@@ -1,5 +1,4 @@
-import { Edit2Icon, UsersIcon, FileDown } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { FileDown } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
@@ -15,11 +14,13 @@ import {
 } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { useStores } from '@/shared/contexts';
-import { ROUTER_PATHS } from '@/shared/consts';
 import { CompanyStatusBadge } from '@/shared/components/CompanyStatusBadge';
 import { UserRole } from '@/entities/User/models';
 import { useCompaniesList } from '@/entities/Company';
 import { useDownloadInternsByCompany } from '@/entities/Practice/hooks/useDownloadInternsByCompany';
+import { CompanyDetailsModal } from '@/pages/CompaniesPage/ui/CompanyDetails/CompanyDetails.tsx';
+import { EditCompanyDialog } from '@/pages/CompaniesPage/ui/EditCompanyDialog';
+import { CreateCuratorModal } from '@/pages/CompaniesPage/ui/CreateCuratorDialog/CreateCuratorDialog.tsx';
 
 export const CompaniesList = observer(() => {
   const {
@@ -55,36 +56,36 @@ export const CompaniesList = observer(() => {
   }
 
   return (
-    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+    <div
+      className='grid gap-4 md:gap-6'
+      style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}
+    >
       {companies.map((company) => (
-        <Card key={company.id} className='flex flex-col'>
-          <CardHeader>
-            <div className='flex justify-between items-start'>
-              <CardTitle className='text-xl'>{company.name}</CardTitle>
-              <CompanyStatusBadge status={company.status} />
+        <Card key={company.id} className='flex flex-col min-w-0'>
+          <CardHeader className='pb-3'>
+            <div className='flex justify-between'>
+              <div className='flex flex-col gap-2'>
+                <div className='flex flex-col justify-between items-start gap-3'>
+                  <CardTitle className='text-lg sm:text-xl max-w-54 leading-tight truncate'>
+                    {company.name}
+                  </CardTitle>
+                </div>
+                <CompanyStatusBadge status={company.status} />
+                <CardDescription className='line-clamp-2 h-10 text-sm'>
+                  {company.description || 'Нет описания'}
+                </CardDescription>
+              </div>
+              <div>
+                {!isStudent && <EditCompanyDialog company={company} />}
+                {!isStudent && <CreateCuratorModal company={company} />}
+              </div>
             </div>
-            <CardDescription className='line-clamp-2 h-10'>
-              {company.description || 'Нет описания'}
-            </CardDescription>
           </CardHeader>
           <CardContent className='flex-grow'>
             {/* Место для доп контента (?) */}
           </CardContent>
           <CardFooter className='flex-col justify-between pt-4 border-t gap-2'>
-            <Button variant='outline' asChild className='w-full'>
-              <Link to={`/companies/${company.id}`}>
-                <UsersIcon className='mr-2 h-4 w-4' />
-                Подробнее
-              </Link>
-            </Button>
-            {!isStudent && (
-              <Button variant='outline' asChild className='w-full'>
-                <Link to={ROUTER_PATHS.EDIT_COMPANY(company.id)}>
-                  <Edit2Icon className='mr-2 h-4 w-4' />
-                  Редактировать
-                </Link>
-              </Button>
-            )}
+            <CompanyDetailsModal company={company} />
             {isDeanMember && (
               <Button
                 variant='outline'
