@@ -1,5 +1,6 @@
 import { Plus, Upload } from 'lucide-react';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 import { CreatePracticeDialogProps } from './CreatePracticeDialog.interfaces';
 
@@ -22,22 +23,17 @@ import {
 } from '@/shared/ui';
 import { useSemesters } from '@/features/SemesterCRUD';
 import { useStreams } from '@/features/StreamsCRUD/hooks';
+import { useCreatePractice } from '@/entities/Practice';
 
 export const CreatePracticeDialog = ({
   open,
   setIsCreateDialogOpen,
 }: CreatePracticeDialogProps) => {
-  /*const mockStreams = [
-    'Информационные системы',
-    'Программная инженерия',
-    'Кибербезопасность',
-  ];
-  const mockSemesters = ['2024-1', '2024-2', '2025-1', '2025-2'];*/
   const { data: semesters = [] } = useSemesters(false);
   const { data: streams = [] } = useStreams();
+  const { mutate: createNewPractice } = useCreatePractice();
 
   const [newInternship, setNewInternship] = useState({
-    name: '',
     stream: '',
     semester: '',
     diaryTemplate: null as File | null,
@@ -58,10 +54,21 @@ export const CreatePracticeDialog = ({
   };
 
   const handleCreateInternship = () => {
-    console.log('Создание практики:', newInternship);
+    if (!newInternship.diaryTemplate || !newInternship.characteristicTemplate) {
+      toast.error('Выберите оба файла');
+      return;
+    }
+
+    createNewPractice({
+      practiceType: 'Technological',
+      semesterId: newInternship.semester,
+      streamId: newInternship.stream,
+      diaryPatternFile: newInternship.diaryTemplate,
+      characteristicsPatternFile: newInternship.characteristicTemplate,
+    });
+
     setIsCreateDialogOpen(false);
     setNewInternship({
-      name: '',
       stream: '',
       semester: '',
       diaryTemplate: null,
@@ -104,18 +111,6 @@ export const CreatePracticeDialog = ({
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          <div className='grid gap-2'>
-            <Label htmlFor='name'>Название практики</Label>
-            <Input
-              id='name'
-              value={newInternship.name}
-              onChange={(e) =>
-                setNewInternship((prev) => ({ ...prev, name: e.target.value }))
-              }
-              placeholder='Введите название практики'
-            />
           </div>
 
           <div className='grid gap-2'>
