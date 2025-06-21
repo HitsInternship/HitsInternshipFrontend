@@ -36,6 +36,7 @@ export const CreatePracticeDialog = ({
   const [newInternship, setNewInternship] = useState({
     stream: '',
     semester: '',
+    previousSemester: '',
     diaryTemplate: null as File | null,
     characteristicTemplate: null as File | null,
   });
@@ -62,6 +63,7 @@ export const CreatePracticeDialog = ({
     createNewPractice({
       practiceType: 'Technological',
       semesterId: newInternship.semester,
+      previousSemesterId: newInternship.previousSemester,
       streamId: newInternship.stream,
       diaryPatternFile: newInternship.diaryTemplate,
       characteristicsPatternFile: newInternship.characteristicTemplate,
@@ -71,6 +73,7 @@ export const CreatePracticeDialog = ({
     setNewInternship({
       stream: '',
       semester: '',
+      previousSemester: '',
       diaryTemplate: null,
       characteristicTemplate: null,
     });
@@ -123,6 +126,30 @@ export const CreatePracticeDialog = ({
             >
               <SelectTrigger>
                 <SelectValue placeholder='Выберите семестр' />
+              </SelectTrigger>
+              <SelectContent>
+                {semesters.map((semester) => (
+                  <SelectItem key={semester.id} value={semester.id}>
+                    {semester.description}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className='grid gap-2'>
+            <Label htmlFor='previousSemester'>Предыдущий семестр</Label>
+            <Select
+              value={newInternship.previousSemester}
+              onValueChange={(value) =>
+                setNewInternship((prev) => ({
+                  ...prev,
+                  previousSemester: value,
+                }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder='Выберите предыдущий семестр' />
               </SelectTrigger>
               <SelectContent>
                 {semesters.map((semester) => (
