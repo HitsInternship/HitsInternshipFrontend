@@ -6,7 +6,6 @@ import { CompanyListSkeleton } from '../CompaniesListSkeleton';
 
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -28,7 +27,6 @@ export const CompaniesList = observer(() => {
     userStore: { roles },
   } = useStores();
 
-  const isStudent = roles.includes(UserRole.Student);
   const isDeanMember = roles.includes(UserRole.DeanMember);
 
   const { data, isLoading } = useCompaniesList();
@@ -58,7 +56,7 @@ export const CompaniesList = observer(() => {
   return (
     <div
       className='grid gap-4 md:gap-6'
-      style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}
+      style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))' }}
     >
       {companies.map((company) => (
         <Card key={company.id} className='flex flex-col min-w-0'>
@@ -66,24 +64,25 @@ export const CompaniesList = observer(() => {
             <div className='flex justify-between'>
               <div className='flex flex-col gap-2'>
                 <div className='flex flex-col justify-between items-start gap-3'>
-                  <CardTitle className='text-lg sm:text-xl max-w-54 leading-tight truncate'>
+                  <CardTitle className='text-lg sm:text-xl max-w-40 leading-tight truncate'>
                     {company.name}
                   </CardTitle>
                 </div>
-                <CompanyStatusBadge status={company.status} />
+                <CompanyStatusBadge
+                  status={company.status}
+                  editingEnabled={isDeanMember}
+                  companyId={company.id}
+                />
                 <CardDescription className='line-clamp-2 h-10 text-sm'>
                   {company.description || 'Нет описания'}
                 </CardDescription>
               </div>
-              <div>
-                {!isStudent && <EditCompanyDialog company={company} />}
-                {!isStudent && <CreateCuratorModal company={company} />}
+              <div className='flex align-left'>
+                {isDeanMember && <EditCompanyDialog company={company} />}
+                {isDeanMember && <CreateCuratorModal company={company} />}
               </div>
             </div>
           </CardHeader>
-          <CardContent className='flex-grow'>
-            {/* Место для доп контента (?) */}
-          </CardContent>
           <CardFooter className='flex-col justify-between pt-4 border-t gap-2'>
             <CompanyDetailsModal company={company} />
             {isDeanMember && (

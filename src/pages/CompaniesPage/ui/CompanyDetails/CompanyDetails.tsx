@@ -36,6 +36,7 @@ import {
   TableRow,
 } from '@/shared/ui/table.tsx';
 import { getDocumentById } from '@/entities/Document/api';
+import { AgreementUploadDialog } from '@/pages/CompaniesPage/ui/AgreementUploadDialog';
 
 interface CompanyDetailsModalProps {
   company: Company;
@@ -100,7 +101,7 @@ export const CompanyDetailsModal = ({ company }: CompanyDetailsModalProps) => {
         <div className='flex-1 grid grid-row-1 gap-6 min-h-0'>
           {/* Документы */}
           <Card className='flex flex-col shadow-sm'>
-            <CardHeader className='pb-4'>
+            <CardHeader className=' flex pb-4 justify-between items-center'>
               <CardTitle className='flex items-center gap-2 text-lg'>
                 <div className='p-2 bg-blue-100 rounded-lg'>
                   <FileText className='h-5 w-5 text-blue-600' />
@@ -112,6 +113,7 @@ export const CompanyDetailsModal = ({ company }: CompanyDetailsModalProps) => {
                   </Badge>
                 )}
               </CardTitle>
+              <AgreementUploadDialog companyId={company.id} />
             </CardHeader>
             <CardContent className='flex-1 min-h-0 pt-0'>
               {agreementsLoading ? (
