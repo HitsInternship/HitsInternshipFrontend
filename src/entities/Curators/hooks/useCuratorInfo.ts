@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getCompany } from '@/entities/Company/api';
+import { getCuratorInfo } from '@/entities/Curators/api';
 
-export const useCompany = (companyId: string) =>
+export const useCuratorInfo = (isCurator: boolean) =>
   useQuery({
-    queryKey: ['company', companyId],
-    queryFn: () => getCompany({ params: { id: companyId } }),
+    queryFn: () => getCuratorInfo({}),
+    queryKey: ['curatorInfo'],
     select: (data) => data.data,
+    enabled: isCurator,
     staleTime: Infinity,
     gcTime: 30 * 60 * 1000,
     refetchOnWindowFocus: false,

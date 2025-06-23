@@ -23,6 +23,7 @@ interface ICompanyStatusBadgeProps {
   status: ECompanyStatus;
   editingEnabled: boolean;
   companyId: string;
+  underCuratorControl: boolean;
 }
 
 const statusConfig = {
@@ -44,6 +45,7 @@ export const CompanyStatusBadge = ({
   status,
   editingEnabled = false,
   companyId,
+  underCuratorControl,
 }: ICompanyStatusBadgeProps) => {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useEditCompanyStatus({
@@ -80,7 +82,9 @@ export const CompanyStatusBadge = ({
 
   if (!editingEnabled) {
     return (
-      <Badge className={currentConfig.className}>{currentConfig.label}</Badge>
+      <Badge className={currentConfig.className}>
+        {currentConfig.label} {underCuratorControl && '(курирую)'}
+      </Badge>
     );
   }
 

@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 
 import { CompaniesList } from '../CompaniesList';
 import { CreateCompanyDialog } from '../CreateCompanyDialog';
@@ -12,7 +13,14 @@ export const CompaniesPage = observer(() => {
     userStore: { roles },
   } = useStores();
 
-  const isStudent = roles.includes(UserRole.Student);
+  const { isDeanMember, isAdmin } = useMemo(() => {
+    const isDeanMember =
+      roles.includes(UserRole.DeanMember) && roles.length === 1;
+    const isStudent = roles.includes(UserRole.Student) && roles.length === 1;
+    const isCurator = roles.includes(UserRole.Curator) && roles.length === 1;
+    const isAdmin = !isDeanMember && !isStudent && !isCurator;
+    return { isDeanMember, isStudent, isCurator, isAdmin };
+  }, [roles]);
 
   return (
     <PageLayout
@@ -20,7 +28,7 @@ export const CompaniesPage = observer(() => {
       subTitle=' Управление компаниями-партнерами и их представителями'
     >
       <div className='container mx-auto py-8 px-4'>
-        {!isStudent && (
+        {(isDeanMember || isAdmin) && (
           <div className='flex flex-col md:flex-row justify-end md:items-center mb-8 gap-4'>
             <CreateCompanyDialog />
           </div>
