@@ -40,7 +40,6 @@ export const VacanciesPage = (): ReactElement => {
   const [isPositionDialogOpen, setIsPositionDialogOpen] = useState(false);
   const [isVacancyDialogOpen, setIsVacancyDialogOpen] = useState(false);
   const [vacanciesData, setVacancies] = useState<IVacancyList | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
 
   const { vacancies, pagination } = vacanciesData ?? {
     vacancies: [],
@@ -55,7 +54,7 @@ export const VacanciesPage = (): ReactElement => {
     companyId: 'all',
     isClosed: false,
     isArchived: false,
-    page: currentPage,
+    page: 1,
   });
 
   const hasActiveFilters =
@@ -71,19 +70,17 @@ export const VacanciesPage = (): ReactElement => {
     setFilters((prev) => ({
       ...prev,
       [key]: value,
+      page: 1,
     }));
-
-    setCurrentPage(1);
   };
 
   const clearFilters = () => {
-    setCurrentPage(1);
     setFilters({
       positionId: 'all',
       companyId: 'all',
       isClosed: false,
       isArchived: false,
-      page: currentPage,
+      page: 1,
     });
   };
 
@@ -109,11 +106,11 @@ export const VacanciesPage = (): ReactElement => {
     });
   };
 
-  const handlePageChange = (
-    key: keyof VacancyFilters,
-    value: string | boolean | number,
-  ) => {
-    handleFilterChange(key, value);
+  const handlePageChange = (value: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page: value,
+    }));
   };
 
   useEffect(() => {
@@ -261,7 +258,7 @@ export const VacanciesPage = (): ReactElement => {
                       variant='outline'
                       size='sm'
                       onClick={() =>
-                        handlePageChange('page', Math.max(1, filters.page - 1))
+                        handlePageChange(Math.max(1, filters.page - 1))
                       }
                       disabled={filters.page <= 1}
                     >
@@ -281,7 +278,7 @@ export const VacanciesPage = (): ReactElement => {
                                 pageNum === filters.page ? 'default' : 'outline'
                               }
                               size='sm'
-                              onClick={() => handlePageChange('page', pageNum)}
+                              onClick={() => handlePageChange(pageNum)}
                               className='w-8 h-8 p-0'
                             >
                               {pageNum}
@@ -296,7 +293,6 @@ export const VacanciesPage = (): ReactElement => {
                       size='sm'
                       onClick={() =>
                         handlePageChange(
-                          'page',
                           Math.min(pagination.count, filters.page + 1),
                         )
                       }

@@ -12,3 +12,4 @@ export { useApplicationFile } from './hooks/useApplicationFile';
 export { useSendApplicationFile } from './hooks/useSendApplicationFile';
 export { useCreateApplication } from './hooks/useCreateApplication';
 export { useUpdateApplicationStatus } from './hooks/useUpdateApplicationStatus';
+export { useDeleteApplication } from './hooks/useDeleteApplication';
