@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Upload, FileText } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import {
   Button,
@@ -18,40 +19,39 @@ import {
 } from '@/shared/ui';
 import { useCompaniesList } from '@/entities/Company';
 import { usePositions } from '@/entities/Position';
-
-// Интерфейсы для данных
-
-interface CreateApplicationData {
-  description: string;
-  companyId: string;
-  positionId: string;
-  document: File | null;
-  date: string;
-}
+import { ICreateApplicationForm } from '@/entities/Application/models';
+import {
+  useCreateApplication,
+  useSendApplicationFile,
+} from '@/entities/Application';
 
 interface CreateApplicationModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess: () => void;
 }
 
 export const CreateApplicationModal = ({
   isOpen,
   onClose,
+  onSuccess,
 }: CreateApplicationModalProps) => {
-  const [formData, setFormData] = useState<CreateApplicationData>({
+  const [formData, setFormData] = useState<ICreateApplicationForm>({
     description: '',
     companyId: '',
     positionId: '',
     document: null,
-    date: '',
+    date: new Date().toISOString().split('T')[0],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { data: companies } = useCompaniesList();
   const { data: positions } = usePositions();
+  const { mutate } = useCreateApplication();
+  const { mutate: sendFileMutate } = useSendApplicationFile();
 
   const handleInputChange = (
-    field: keyof CreateApplicationData,
+    field: keyof ICreateApplicationForm,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: any,
   ) => {
@@ -104,26 +104,23 @@ export const CreateApplicationModal = ({
     setIsSubmitting(true);
 
     try {
-      // Добавляем текущую дату
-      //   const dataToSubmit = {
-      //     ...formData,
-      //     date: new Date().toISOString(),
-      //   };
+      mutate(formData, {
+        onSuccess: (id) => {
+          sendFileMutate(
+            { id, file: formData.document! },
+            {
+              onError: () => {
+                toast.error('Ошибка загрузки файла');
+              },
+            },
+          );
+          onSuccess();
+        },
+        onError: () => {
+          toast.error('Ошибка загрузки заявки');
+        },
+      });
 
-      // Здесь будет реальный API запрос
-      // const response = await fetch('/api/applications', {
-      //   method: 'POST',
-      //   body: formData // или FormData для файла
-      // })
-
-      // Имитация отправки
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      //   if (onSubmit) {
-      //       onSubmit(dataToSubmit);
-      //   }
-
-      // Сбрасываем форму и закрываем модальное окно
       setFormData({
         description: '',
         companyId: '',
@@ -131,6 +128,7 @@ export const CreateApplicationModal = ({
         document: null,
         date: '',
       });
+
       onClose();
     } catch (error) {
       console.error('Ошибка при отправке заявки:', error);
@@ -228,7 +226,7 @@ export const CreateApplicationModal = ({
                 <SelectTrigger
                   className={errors.positionId ? 'border-red-500' : ''}
                 >
-                  <SelectValue placeholder={'Выберите позицию'} />
+                  <SelectValue placeholder='Выберите позицию' />
                 </SelectTrigger>
                 <SelectContent>
                   {positions?.map((position) => (

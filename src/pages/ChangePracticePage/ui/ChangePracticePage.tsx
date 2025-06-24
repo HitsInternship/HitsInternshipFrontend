@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Filter, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Filter, Plus, Search } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-import { mockData } from './data';
-import { ApplicationCard } from './ApplicationCard';
-
-import { ApplicationListResponse } from '@/entities/Application';
+import {
+  ApplicationListResponse,
+  useApplications,
+} from '@/entities/Application';
 import {
   Button,
   Card,
@@ -22,68 +23,43 @@ import {
   SelectValue,
   Switch,
 } from '@/shared/ui';
+import { ApplicationCard } from '@/widgets/ApplicationCard';
+import { IApplicationFilters } from '@/entities/Application/models/types';
+import { useStores } from '@/shared/contexts';
+import { UserRole } from '@/entities/User/models';
+import { CreateApplicationModal } from '@/features/CreateApplicationModal/ui/CreateApplicationModal ';
 export const ChangePracticePage = () => {
-  const [data, setData] = useState<ApplicationListResponse>(mockData);
-  const [loading, setLoading] = useState(false);
+  const {
+    userStore: { roles },
+  } = useStores();
+  const [data, setData] = useState<ApplicationListResponse>();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Состояние фильтров
-  const [filters, setFilters] = useState({
-    status: 'null',
-    studentId: '',
-    showArchived: false,
+  const { mutate } = useApplications();
+
+  const [filters, setFilters] = useState<IApplicationFilters>({
+    isArchived: false,
     page: 1,
   });
 
+  const isDeanMember = roles.includes(UserRole.DeanMember);
+
   // const [filtersChanged, setFiltersChanged] = useState(false);
 
-  // Функция для получения данных (заглушка)
   const fetchData = async () => {
-    setLoading(true);
-    // setFiltersChanged(false);
-    // Здесь будет реальный API запрос
-    // const response = await fetch('/api/applications', { ... })
-    // const data = await response.json()
+    setIsLoading(true);
 
-    // Имитация загрузки
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    console.log(filters);
-
-    // Фильтрация данных для демонстрации
-    let filteredApplications = mockData.applications;
-
-    console.log(filteredApplications);
-    if (filters.status !== 'null') {
-      filteredApplications = filteredApplications.filter(
-        (app) => app.status.toString() === filters.status,
-      );
-    }
-
-    if (filters.studentId) {
-      filteredApplications = filteredApplications.filter(
-        (app) =>
-          app.student.id.includes(filters.studentId) ||
-          `${app.student.surname} ${app.student.name}`
-            .toLowerCase()
-            .includes(filters.studentId.toLowerCase()),
-      );
-    }
-
-    if (!filters.showArchived) {
-      filteredApplications = filteredApplications.filter(
-        (app) => !app.isDeleted,
-      );
-    }
-
-    setData({
-      applications: filteredApplications,
-      pagination: {
-        ...mockData.pagination,
-        current: filters.page,
+    mutate(filters, {
+      onSuccess: (result) => {
+        setData(result);
+        setIsLoading(false);
+      },
+      onError: () => {
+        toast.error('Ошибка загрузки вакансий');
+        setIsLoading(false);
       },
     });
-
-    setLoading(false);
   };
 
   const handleFilterChange = (key: string, value: any) => {
@@ -93,6 +69,26 @@ export const ChangePracticePage = () => {
       page: key !== 'page' ? 1 : value, // Сброс страницы при изменении других фильтров
     }));
     // setFiltersChanged(true);
+  };
+
+  const successCreate = () => {
+    setFilters({
+      isArchived: false,
+      page: 1,
+    });
+
+    console.log(filters);
+
+    mutate(filters, {
+      onSuccess: (result) => {
+        setData(result);
+        setIsLoading(false);
+      },
+      onError: () => {
+        toast.error('Ошибка загрузки вакансий');
+        setIsLoading(false);
+      },
+    });
   };
 
   const handlePageChange = (key: string, value: any) => {
@@ -106,8 +102,23 @@ export const ChangePracticePage = () => {
   return (
     <PageLayout
       title='Заявки на смену места практики'
-      subTitle='Управление заявками студентов на изменение места прохождения практики'
+      subTitle={
+        isDeanMember &&
+        'Управление заявками студентов на изменение места прохождения практики'
+      }
     >
+      <Button
+        onClick={() => setShowCreateModal(true)}
+        className='flex items-center gap-2 mb-4'
+      >
+        <Plus className='h-4 w-4' />
+        Заявка
+      </Button>
+      <CreateApplicationModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={successCreate}
+      />
       <Card className='mb-3'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
@@ -138,29 +149,29 @@ export const ChangePracticePage = () => {
               </Select>
             </div>
 
-            <div className='space-y-2'>
-              <Label htmlFor='studentId'>Поиск студента</Label>
-              <div className='relative'>
-                <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
-                <Input
-                  id='studentId'
-                  placeholder='ФИО'
-                  value={filters.studentId}
-                  onChange={(e) =>
-                    handleFilterChange('studentId', e.target.value)
-                  }
-                  className='pl-10'
-                />
+            {isDeanMember && (
+              <div className='space-y-2'>
+                <Label htmlFor='name'>Поиск студента</Label>
+                <div className='relative'>
+                  <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
+                  <Input
+                    id='name'
+                    placeholder='ФИО'
+                    value={filters.name}
+                    onChange={(e) => handleFilterChange('name', e.target.value)}
+                    className='pl-10'
+                  />
+                </div>
               </div>
-            </div>
+            )}
             <div className='space-y-2'>
-              <Label htmlFor='showArchived'>Архивные заявки</Label>
+              <Label htmlFor='isArchived'>Архивные заявки</Label>
               <div className='flex items-center space-x-2'>
                 <Switch
-                  id='showArchived'
-                  checked={filters.showArchived}
+                  id='isArchived'
+                  checked={filters.isArchived}
                   onCheckedChange={(checked) =>
-                    handleFilterChange('showArchived', checked)
+                    handleFilterChange('isArchived', checked)
                   }
                 />
               </div>
@@ -169,18 +180,19 @@ export const ChangePracticePage = () => {
             <div className='space-y-2'>
               <Label>Найдено заявок</Label>
               <div className='text-2xl font-bold text-primary'>
-                {data.applications.length}
+                {data?.applications.length}
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
+
       <div className='space-y-4'>
-        {loading ? (
+        {isLoading ? (
           <div className='flex items-center justify-center py-8'>
             <div className='text-muted-foreground'>Загрузка...</div>
           </div>
-        ) : data.applications.length === 0 ? (
+        ) : data?.applications.length === 0 ? (
           <Card>
             <CardContent className='flex items-center justify-center py-8'>
               <div className='text-center'>
@@ -194,19 +206,19 @@ export const ChangePracticePage = () => {
             </CardContent>
           </Card>
         ) : (
-          data.applications.map((application) => (
+          data?.applications.map((application) => (
             <ApplicationCard {...application} />
           ))
         )}
       </div>
 
       {/* Пагинация */}
-      {data.pagination.count > 1 && (
+      {data?.pagination.count && data?.pagination.count > 1 && (
         <Card className='mt-3'>
           <CardContent className='p-4'>
             <div className='flex items-center justify-between'>
               <div className='text-sm text-muted-foreground'>
-                Страница {data.pagination.current} из {data.pagination.count}
+                Страница {data?.pagination.current} из {data?.pagination.count}
               </div>
               <div className='flex items-center gap-2'>
                 <Button
@@ -223,7 +235,7 @@ export const ChangePracticePage = () => {
 
                 <div className='flex items-center gap-1'>
                   {Array.from(
-                    { length: Math.min(5, data.pagination.count) },
+                    { length: Math.min(5, data?.pagination.count) },
                     (_, i) => {
                       const pageNum = i + 1;
                       return (

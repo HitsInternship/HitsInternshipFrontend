@@ -9,6 +9,7 @@ import {
   Building,
   Briefcase,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import {
   Select,
@@ -24,14 +25,21 @@ import {
   DialogHeader,
   DialogTitle,
   Textarea,
+  Input,
 } from '@/shared/ui';
-import { IApplicationDetails } from '@/entities/Application';
+import {
+  IApplicationDetails,
+  useApplicationFile,
+  useApplicationInfo,
+  useSendApplicationFile,
+} from '@/entities/Application';
 import { EApplicationStatus } from '@/entities/Application/models/types';
-import { EInternshipStatus, EStudentStatus } from '@/entities/Student';
-import { ECompanyStatus } from '@/entities/Company/models';
+import { Separator } from '@/shared/ui/separator';
+import { UserRole } from '@/entities/User/models';
+import { useStores } from '@/shared/contexts';
 
 interface ApplicationModalProps {
-  applicationId: string | null;
+  applicationId: string;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -45,54 +53,53 @@ export const ApplicationModal = ({
     useState<IApplicationDetails | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
+  const [fileLink, setFileLink] = useState<string | null>(null);
 
-  // Функция для получения детальной информации о заявке
-  const fetchApplicationDetail = async () => {
+  const {
+    userStore: { roles },
+  } = useStores();
+
+  const isDeanMember = roles.includes(UserRole.DeanMember);
+  const isStudent = roles.includes(UserRole.Student);
+
+  const { mutate } = useApplicationInfo();
+  const { mutate: fileMutate } = useApplicationFile();
+  const { mutate: sendFileMutate } = useSendApplicationFile();
+
+  const sendFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    if (file) {
+      sendFileMutate(
+        { file, id: applicationId },
+        {
+          onSuccess: fetchData,
+        },
+      );
+    }
+  };
+
+  const fetchData = async () => {
     setDetailLoading(true);
-    // Здесь будет реальный API запрос
-    // const response = await fetch(`/api/applications/${id}`)
-    // const data = await response.json()
 
-    // Имитация загрузки
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    mutate(applicationId, {
+      onSuccess: (result) => {
+        setApplicationDetail(result);
+        setDetailLoading(false);
+      },
+      onError: () => {
+        toast.error('Ошибка загрузки заявки');
+        setDetailLoading(false);
+      },
+    });
 
-    // Моковые детальные данные
-    const mockDetail: IApplicationDetails = {
-      description:
-        'Студент просит сменить место практики с текущей компании на новую в связи с более подходящими условиями и возможностями для профессионального развития. Новая компания предлагает работу по специальности с возможностью дальнейшего трудоустройства.',
-      date: '2025-06-07T09:36:52.374Z',
-      documentUrl: 'https://example.com/documents/application-123.pdf',
-      status: EApplicationStatus.Created,
-      student: {
-        id: 'student-1',
-        name: 'Иван',
-        surname: 'Петров',
-        middlename: 'Сергеевич',
-        email: 'ivan.petrov@example.com',
-        phone: '+7 (999) 123-45-67',
-        isHeadMan: false,
-        status: EStudentStatus.InProcess,
-        internshipStatus: EInternshipStatus.GotInternship,
-        groupNumber: 101,
-        course: 3,
+    fileMutate(applicationId, {
+      onSuccess: (result) => {
+        setFileLink(result);
       },
-      company: {
-        id: 'company-1',
-        name: 'ООО "Технологии Будущего"',
-        description: 'Разработка программного обеспечения',
-        status: ECompanyStatus.Partner,
+      onError: () => {
+        toast.error('Ошибка загрузки файла');
       },
-      position: {
-        id: 'position-1',
-        isDeleted: false,
-        name: 'Frontend разработчик',
-        description:
-          'Разработка пользовательских интерфейсов с использованием React, TypeScript и современных инструментов разработки',
-      },
-    };
-
-    setApplicationDetail(mockDetail);
-    setDetailLoading(false);
+    });
   };
 
   // Функция для обновления статуса заявки
@@ -235,10 +242,9 @@ export const ApplicationModal = ({
     });
   };
 
-  // Загружаем данные при открытии модального окна
   useEffect(() => {
     if (isOpen && applicationId) {
-      fetchApplicationDetail();
+      fetchData();
     } else {
       setApplicationDetail(null);
     }
@@ -270,6 +276,30 @@ export const ApplicationModal = ({
                 </div>
               </div>
             </div>
+            {isDeanMember && (
+              <div className='flex items-center gap-2 '>
+                <Label htmlFor='status-select' className='text-sm font-medium'>
+                  Изменить статус:
+                </Label>
+                <Select
+                  value={applicationDetail.status.toString()}
+                  onValueChange={updateApplicationStatus}
+                  disabled={statusUpdating}
+                >
+                  <SelectTrigger className='w-48'>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='Created'>Создана</SelectItem>
+                    <SelectItem value='UnderConsideration'>
+                      На рассмотрении
+                    </SelectItem>
+                    <SelectItem value='Rejected'>Отклонена</SelectItem>
+                    <SelectItem value='Accepted'>Принята</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* Описание заявки */}
             <div className='space-y-2'>
@@ -282,7 +312,7 @@ export const ApplicationModal = ({
             </div>
 
             {/* Документ */}
-            {applicationDetail.documentUrl && (
+            {fileLink ? (
               <div className='space-y-2'>
                 <Label className='text-sm font-medium'>
                   Прикрепленный документ
@@ -292,7 +322,7 @@ export const ApplicationModal = ({
                   <span className='flex-1 text-sm'>Документ заявки</span>
                   <Button variant='outline' size='sm' asChild>
                     <a
-                      href={applicationDetail.documentUrl}
+                      href={fileLink}
                       target='_blank'
                       rel='noopener noreferrer'
                     >
@@ -300,6 +330,23 @@ export const ApplicationModal = ({
                       Скачать
                     </a>
                   </Button>
+                </div>
+              </div>
+            ) : (
+              <div className='space-y-2'>
+                <Label htmlFor='document' className='text-sm font-medium'>
+                  Документ заявки <span className='text-red-500'>*</span>
+                </Label>
+                <div className='space-y-2'>
+                  <div className='flex items-center gap-2 '>
+                    <Input
+                      id='document'
+                      type='file'
+                      accept='.pdf,.doc,.docx,.txt'
+                      onChange={sendFile}
+                      className='w-full file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/80'
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -316,7 +363,7 @@ export const ApplicationModal = ({
                     <div className='font-medium'>
                       {`${applicationDetail.student.surname} ${applicationDetail.student.name} ${applicationDetail.student.middlename}`}
                     </div>
-                    <div className='flex flex-col  gap-2 mt-1'>
+                    <div className='flex flex-row  gap-2 mt-1'>
                       {applicationDetail.student.isHeadMan && (
                         <Badge variant='outline' className='text-xs'>
                           Староста
@@ -357,11 +404,11 @@ export const ApplicationModal = ({
                 <div className='space-y-2'>
                   <div className='flex items-center gap-2'>
                     <span className='font-medium'>
-                      {applicationDetail.company.name}
+                      {applicationDetail.newCompany.name}
                     </span>
                   </div>
                   <p className='text-sm text-muted-foreground'>
-                    {applicationDetail.company.description}
+                    {applicationDetail.newCompany.description}
                   </p>
                 </div>
               </div>
@@ -374,35 +421,27 @@ export const ApplicationModal = ({
                 </div>
                 <div className='space-y-2'>
                   <div className='font-medium'>
-                    {applicationDetail.position.name}
+                    {applicationDetail.newPosition.name}
                   </div>
                   <p className='text-sm text-muted-foreground'>
-                    {applicationDetail.position.description}
+                    {applicationDetail.newPosition.description}
                   </p>
                 </div>
               </div>
             </div>
-            <div className='flex items-center gap-2'>
-              <Label htmlFor='status-select' className='text-sm font-medium'>
-                Изменить статус:
-              </Label>
-              <Select
-                value={applicationDetail.status.toString()}
-                onValueChange={updateApplicationStatus}
-                disabled={statusUpdating}
-              >
-                <SelectTrigger className='w-48'>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='Created'>Создана</SelectItem>
-                  <SelectItem value='UnderConsideration'>
-                    На рассмотрении
-                  </SelectItem>
-                  <SelectItem value='Rejected'>Отклонена</SelectItem>
-                  <SelectItem value='Accepted'>Принята</SelectItem>
-                </SelectContent>
-              </Select>
+            <Separator />
+            <div className='flex gap-5 items-start'>
+              <div className='flex items-center gap-2 text-sm font-medium'>
+                Прошлое место:
+              </div>
+              <div>
+                <p className='text-sm t font-medium'>
+                  {applicationDetail.oldCompany.name}
+                </p>
+                <p className='text-sm t'>
+                  {applicationDetail.oldPosition.name}
+                </p>
+              </div>
             </div>
           </div>
         ) : (

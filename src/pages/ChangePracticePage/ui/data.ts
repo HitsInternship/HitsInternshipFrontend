@@ -23,13 +23,25 @@ export const mockData: ApplicationListResponse = {
         groupNumber: 101,
         course: 3,
       },
-      company: {
+      newCompany: {
         id: 'company-1',
         name: 'ООО "Технологии Будущего"',
         description: 'Разработка программного обеспечения',
         status: ECompanyStatus.Partner,
       },
-      position: {
+      newPosition: {
+        id: 'position-1',
+        isDeleted: false,
+        name: 'Frontend разработчик',
+        description: 'Разработка пользовательских интерфейсов',
+      },
+      oldCompany: {
+        id: 'company-1',
+        name: 'ООО "Технологии Будущего"',
+        description: 'Разработка программного обеспечения',
+        status: ECompanyStatus.Partner,
+      },
+      oldPosition: {
         id: 'position-1',
         isDeleted: false,
         name: 'Frontend разработчик',
@@ -54,17 +66,29 @@ export const mockData: ApplicationListResponse = {
         groupNumber: 102,
         course: 4,
       },
-      company: {
+      newCompany: {
         id: 'company-2',
         name: 'АО "Инновационные Решения"',
         description: 'Консалтинг и IT-услуги',
         status: ECompanyStatus.Partner,
       },
-      position: {
+      newPosition: {
         id: 'position-2',
         isDeleted: false,
         name: 'Backend разработчик',
         description: 'Разработка серверной части приложений',
+      },
+      oldCompany: {
+        id: 'company-1',
+        name: 'ООО "Технологии Будущего"',
+        description: 'Разработка программного обеспечения',
+        status: ECompanyStatus.Partner,
+      },
+      oldPosition: {
+        id: 'position-1',
+        isDeleted: false,
+        name: 'Frontend разработчик',
+        description: 'Разработка пользовательских интерфейсов',
       },
     },
     {
@@ -85,17 +109,29 @@ export const mockData: ApplicationListResponse = {
         groupNumber: 103,
         course: 2,
       },
-      company: {
+      newCompany: {
         id: 'company-3',
         name: 'ИП Козлов А.В.',
         description: 'Веб-разработка',
         status: ECompanyStatus.Partner,
       },
-      position: {
+      newPosition: {
         id: 'position-3',
         isDeleted: false,
         name: 'Fullstack разработчик',
         description: 'Полный цикл разработки веб-приложений',
+      },
+      oldCompany: {
+        id: 'company-2',
+        name: 'АО "Инновационные Решения"',
+        description: 'Консалтинг и IT-услуги',
+        status: ECompanyStatus.Partner,
+      },
+      oldPosition: {
+        id: 'position-2',
+        isDeleted: false,
+        name: 'Backend разработчик',
+        description: 'Разработка серверной части приложений',
       },
     },
   ],

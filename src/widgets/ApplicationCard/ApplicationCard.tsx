@@ -1,16 +1,27 @@
-import { Briefcase, Building, Calendar, Mail, Phone, User } from 'lucide-react';
+import {
+  Briefcase,
+  Building,
+  Calendar,
+  Mail,
+  MessageCircle,
+  Phone,
+  User,
+} from 'lucide-react';
 import { useState } from 'react';
+
+import { CommentsModal } from '../CommentsModal/CommentsModal';
 
 import { IApplication } from '@/entities/Application';
 import { EApplicationStatus } from '@/entities/Application/models/types';
-import { Badge, Card, CardContent } from '@/shared/ui';
+import { Badge, Button, Card, CardContent } from '@/shared/ui';
 import { ApplicationModal } from '@/widgets/ApplicationModal';
+import { Separator } from '@/shared/ui/separator';
 
 export const ApplicationCard = (application: IApplication) => {
   const [isModalOpen, setIsModelOpen] = useState(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 
   const getStatusBadge = (status: EApplicationStatus) => {
-    console.log(status);
     const statusConfig = {
       [EApplicationStatus.Created]: {
         label: 'Создана',
@@ -31,7 +42,6 @@ export const ApplicationCard = (application: IApplication) => {
     };
 
     const config = statusConfig[status as keyof typeof statusConfig];
-    console.log(status);
 
     return (
       <Badge
@@ -57,6 +67,11 @@ export const ApplicationCard = (application: IApplication) => {
     });
   };
 
+  const handleCommentsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsCommentsOpen(true);
+  };
+
   return (
     <>
       <Card
@@ -64,7 +79,7 @@ export const ApplicationCard = (application: IApplication) => {
         className={application.isDeleted ? 'opacity-60 border-dashed' : ''}
         onClick={() => setIsModelOpen(true)}
       >
-        <CardContent className='p-6'>
+        <CardContent className='px-6'>
           <div className='flex items-start justify-between mb-4'>
             <div className='flex items-center gap-3'>
               {getStatusBadge(application.status)}
@@ -74,14 +89,16 @@ export const ApplicationCard = (application: IApplication) => {
                 </Badge>
               )}
             </div>
+
             <div className='text-sm text-muted-foreground flex items-center gap-1'>
               <Calendar className='h-4 w-4' />
               {formatDate(application.date)}
             </div>
           </div>
 
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+          <div className='flex flex-col wrap sm:flex-row gap-6  justify-between'>
             {/* Информация о студенте */}
+
             <div className='space-y-3'>
               <div className='flex items-center gap-2 text-sm font-medium'>
                 <User className='h-4 w-4' />
@@ -106,8 +123,8 @@ export const ApplicationCard = (application: IApplication) => {
                     {application.student.phone}
                   </div>
                   <div>
-                    Группа {application.student.groupNumber},{' '}
-                    {application.student.course} курс
+                    группа {application.student.groupNumber}, курс{' '}
+                    {application.student.course}
                   </div>
                 </div>
               </div>
@@ -122,11 +139,11 @@ export const ApplicationCard = (application: IApplication) => {
               <div className='space-y-2'>
                 <div className='flex items-center gap-2'>
                   <span className='font-medium'>
-                    {application.company.name}
+                    {application.newCompany.name}
                   </span>
                 </div>
                 <p className='text-sm text-muted-foreground'>
-                  {application.company.description}
+                  {application.newCompany.description}
                 </p>
               </div>
             </div>
@@ -138,12 +155,40 @@ export const ApplicationCard = (application: IApplication) => {
                 Позиция
               </div>
               <div className='space-y-2'>
-                <div className='font-medium'>{application.position.name}</div>
+                <div className='font-medium'>
+                  {application.newPosition.name}
+                </div>
                 <p className='text-sm text-muted-foreground'>
-                  {application.position.description}
+                  {application.newPosition.description}
                 </p>
               </div>
             </div>
+          </div>
+          <Separator className='my-3' />
+          <div className='flex gap-5 items-start justify-between'>
+            <div className='flex items-start gap-4'>
+              <div className=' text-sm font-medium'>Прошлое место:</div>
+              <div>
+                <p className='text-sm t font-medium'>
+                  {application.oldCompany.name}
+                </p>
+                <p className='text-sm t'>{application.oldPosition.name}</p>
+              </div>
+            </div>
+            <Button
+              variant='ghost'
+              size='sm'
+              className=' px-2 hover:bg-blue-50'
+              onClick={handleCommentsClick}
+              data-comments-button
+            >
+              <MessageCircle className='h-10 w-10' />
+              {application.commentsCount > 0 && (
+                <span className=' text-xs font-medium'>
+                  {application.commentsCount}
+                </span>
+              )}
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -151,6 +196,11 @@ export const ApplicationCard = (application: IApplication) => {
         applicationId={application.id}
         isOpen={isModalOpen}
         onClose={() => setIsModelOpen(false)}
+      />
+      <CommentsModal
+        applicationId={application.id}
+        isOpen={isCommentsOpen}
+        onClose={() => setIsCommentsOpen(false)}
       />
     </>
   );

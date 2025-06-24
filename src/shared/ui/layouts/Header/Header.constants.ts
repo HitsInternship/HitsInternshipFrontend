@@ -39,11 +39,6 @@ export const HeaderItems: IHeaderItem[] = [
     roles: [UserRole.Curator, UserRole.DeanMember, UserRole.Student],
   },
   {
-    name: 'Смены практик',
-    link: ROUTER_PATHS.CHANGE_PRACTICE,
-    roles: [ UserRole.DeanMember],
-  },
-  {
     name: 'Отборы',
     link: ROUTER_PATHS.SELECTIONS,
     roles: [ UserRole.DeanMember, UserRole.Curator],

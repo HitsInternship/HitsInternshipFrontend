@@ -3,11 +3,11 @@ import {
   Download,
   FileText,
   MessageSquare,
-  Plus,
   Star,
   Upload,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import {
   Badge,
@@ -31,7 +31,7 @@ import {
   AccordionTrigger,
 } from '@/shared/ui/accordion';
 import { Separator } from '@/shared/ui/separator';
-import { CreateApplicationModal } from '@/features/CreateApplicationModal/ui/CreateApplicationModal ';
+import { ROUTER_PATHS } from '@/shared/consts';
 
 export const StudentPractice = () => {
   interface Practice {
@@ -80,6 +80,8 @@ export const StudentPractice = () => {
     },
   ];
 
+  const navigate = useNavigate();
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'not_uploaded':
@@ -94,8 +96,6 @@ export const StudentPractice = () => {
   };
 
   const [selectedComments, setSelectedComments] = useState<string[]>([]);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-
   const handleFileUpload = (type: 'diary' | 'characteristic') => {
     // Имитация загрузки файла
     console.log(`Загрузка ${type === 'diary' ? 'дневника' : 'характеристики'}`);
@@ -109,24 +109,14 @@ export const StudentPractice = () => {
   };
   return (
     <>
-      <div className='mb-4'>
-        <h1 className='text-3xl font-bold mb-2'>Мои практики</h1>
-        <p className='text-muted-foreground'>
-          Управление документами и отслеживание прогресса по практикам
-        </p>
+      <div className='mb-4 flex gap-4'>
+        <Button
+          className='flex items-center gap-2 mb-4'
+          onClick={() => navigate(ROUTER_PATHS.CHANGE_PRACTICE)}
+        >
+          Мои заявки
+        </Button>
       </div>
-      <Button
-        onClick={() => setShowCreateModal(true)}
-        className='flex items-center gap-2 mb-4'
-      >
-        <Plus className='h-4 w-4' />
-        Заявка на смену
-      </Button>
-
-      <CreateApplicationModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-      />
 
       <Accordion type='single' collapsible className='space-y-4'>
         {practices.map((practice) => (
