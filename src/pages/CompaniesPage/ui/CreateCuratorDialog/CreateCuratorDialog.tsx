@@ -194,8 +194,9 @@ export const CreateCuratorModal = ({ company }: { company: Company }) => {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant='ghost' onClick={() => setIsModalOpen(true)}>
+        <Button variant='outline' onClick={() => setIsModalOpen(true)}>
           <UserPlus className='h-4 w-4' />
+          Добавить
         </Button>
       </DialogTrigger>
       <DialogContent className='max-w-lg'>

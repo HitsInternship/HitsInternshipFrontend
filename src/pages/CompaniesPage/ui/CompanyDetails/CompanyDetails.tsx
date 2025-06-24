@@ -37,6 +37,9 @@ import {
 } from '@/shared/ui/table.tsx';
 import { getDocumentById } from '@/entities/Document/api';
 import { AgreementUploadDialog } from '@/pages/CompaniesPage/ui/AgreementUploadDialog';
+import { CreateCuratorModal } from '@/pages/CompaniesPage/ui/CreateCuratorDialog/CreateCuratorDialog.tsx';
+import { useStores } from '@/shared/contexts';
+import { UserRole } from '@/entities/User/models';
 
 interface CompanyDetailsModalProps {
   company: Company;
@@ -44,6 +47,13 @@ interface CompanyDetailsModalProps {
 
 export const CompanyDetailsModal = ({ company }: CompanyDetailsModalProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const {
+    userStore: { roles },
+  } = useStores();
+
+  const isDeanMember =
+    roles.includes(UserRole.DeanMember) && roles.length === 1;
 
   const { data: curators, isLoading: curatorsLoading } = useCompanyCurators(
     company.id,
@@ -86,7 +96,7 @@ export const CompanyDetailsModal = ({ company }: CompanyDetailsModalProps) => {
           <span className='truncate'>Подробнее</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className='h-[85vh] flex flex-col'>
+      <DialogContent className='h-fit flex flex-col'>
         <DialogHeader className='pb-4'>
           <DialogTitle className='text-2xl font-bold'>
             {company.name}
@@ -98,9 +108,9 @@ export const CompanyDetailsModal = ({ company }: CompanyDetailsModalProps) => {
           )}
         </DialogHeader>
 
-        <div className='flex-1 grid grid-row-1 gap-6 min-h-0'>
+        <div className='flex flex-col gap-5 h-full'>
           {/* Документы */}
-          <Card className='flex flex-col shadow-sm'>
+          <Card className='flex flex-col shadow-sm h-fit'>
             <CardHeader className=' flex pb-4 justify-between items-center'>
               <CardTitle className='flex items-center gap-2 text-lg'>
                 <div className='p-2 bg-blue-100 rounded-lg'>
@@ -115,7 +125,7 @@ export const CompanyDetailsModal = ({ company }: CompanyDetailsModalProps) => {
               </CardTitle>
               <AgreementUploadDialog companyId={company.id} />
             </CardHeader>
-            <CardContent className='flex-1 min-h-0 pt-0'>
+            <CardContent className='h-fit'>
               {agreementsLoading ? (
                 <div className='flex items-center justify-center h-40'>
                   <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600' />
@@ -129,7 +139,7 @@ export const CompanyDetailsModal = ({ company }: CompanyDetailsModalProps) => {
                   <p className='text-center'>Документы отсутствуют</p>
                 </div>
               ) : (
-                <ScrollArea className='h-56 pr-4'>
+                <div className='h-fit max-h-40 overflow-y-scroll pr-4'>
                   <div className='space-y-2'>
                     {agreements.map((agreement: Agreement) => (
                       <div
@@ -160,7 +170,7 @@ export const CompanyDetailsModal = ({ company }: CompanyDetailsModalProps) => {
                       </div>
                     ))}
                   </div>
-                </ScrollArea>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -168,7 +178,7 @@ export const CompanyDetailsModal = ({ company }: CompanyDetailsModalProps) => {
           {/* Кураторы */}
           <Card className='flex flex-col shadow-sm'>
             <CardHeader className='pb-4'>
-              <CardTitle className='flex items-center gap-2 text-lg'>
+              <CardTitle className='flex items-center gap-2 text-lg mb-2'>
                 <div className='p-2 bg-green-100 rounded-lg'>
                   <User className='h-5 w-5 text-green-600' />
                 </div>
@@ -179,6 +189,7 @@ export const CompanyDetailsModal = ({ company }: CompanyDetailsModalProps) => {
                   </Badge>
                 )}
               </CardTitle>
+              {isDeanMember && <CreateCuratorModal company={company} />}
             </CardHeader>
             <CardContent className='flex-1 min-h-0 pt-0'>
               {curatorsLoading ? (

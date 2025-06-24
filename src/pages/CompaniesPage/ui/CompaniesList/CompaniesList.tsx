@@ -19,7 +19,6 @@ import { useCompaniesList } from '@/entities/Company';
 import { useDownloadInternsByCompany } from '@/entities/Practice/hooks/useDownloadInternsByCompany';
 import { CompanyDetailsModal } from '@/pages/CompaniesPage/ui/CompanyDetails/CompanyDetails.tsx';
 import { EditCompanyDialog } from '@/pages/CompaniesPage/ui/EditCompanyDialog';
-import { CreateCuratorModal } from '@/pages/CompaniesPage/ui/CreateCuratorDialog/CreateCuratorDialog.tsx';
 import { ECompanyStatus } from '@/entities/Company/models';
 import { useCuratorInfo } from '@/entities/Curators/hooks/useCuratorInfo.ts';
 
@@ -83,7 +82,7 @@ export const CompaniesList = observer(() => {
             <div className='flex justify-between'>
               <div className='flex flex-col gap-2'>
                 <div className='flex flex-row items-center gap-2'>
-                  <CardTitle className='text-lg sm:text-xl max-w-40 leading-tight truncate'>
+                  <CardTitle className='text-lg sm:text-xl max-w-50 text-wrap leading-tight truncate'>
                     {company.name}
                   </CardTitle>
                 </div>
@@ -101,7 +100,6 @@ export const CompaniesList = observer(() => {
               </div>
               <div className='flex align-left'>
                 {isDeanMember && <EditCompanyDialog company={company} />}
-                {isDeanMember && <CreateCuratorModal company={company} />}
               </div>
             </div>
           </CardHeader>
