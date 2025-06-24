@@ -25,44 +25,10 @@ import {
   DialogTitle,
   Textarea,
 } from '@/shared/ui';
-
-// Интерфейс для детальных данных заявки
-interface ApplicationDetail {
-  description: string;
-  date: string;
-  documentUrl: string;
-  status: 'Created' | 'UnderConsideration' | 'Rejected' | 'Accepted';
-  student: {
-    id: string;
-    name: string;
-    surname: string;
-    middlename: string;
-    email: string;
-    phone: string;
-    isHeadMan: boolean;
-    status:
-      | 'Expelled'
-      | 'OnAcademicLeave'
-      | 'InProcess'
-      | 'Transferred'
-      | 'Graduated';
-    internshipStatus: 'Small' | 'Candidate' | 'Internship';
-    groupNumber: number;
-    course: number;
-  };
-  company: {
-    id: string;
-    name: string;
-    description: string;
-    status: 'Partner' | 'Regular' | 'Blacklisted';
-  };
-  position: {
-    id: string;
-    isDeleted: boolean;
-    name: string;
-    description: string;
-  };
-}
+import { IApplicationDetails } from '@/entities/Application';
+import { EApplicationStatus } from '@/entities/Application/models/types';
+import { EInternshipStatus, EStudentStatus } from '@/entities/Student';
+import { ECompanyStatus } from '@/entities/Company/models';
 
 interface ApplicationModalProps {
   applicationId: string | null;
@@ -76,7 +42,7 @@ export const ApplicationModal = ({
   onClose,
 }: ApplicationModalProps) => {
   const [applicationDetail, setApplicationDetail] =
-    useState<ApplicationDetail | null>(null);
+    useState<IApplicationDetails | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
 
@@ -91,12 +57,12 @@ export const ApplicationModal = ({
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Моковые детальные данные
-    const mockDetail: ApplicationDetail = {
+    const mockDetail: IApplicationDetails = {
       description:
         'Студент просит сменить место практики с текущей компании на новую в связи с более подходящими условиями и возможностями для профессионального развития. Новая компания предлагает работу по специальности с возможностью дальнейшего трудоустройства.',
       date: '2025-06-07T09:36:52.374Z',
       documentUrl: 'https://example.com/documents/application-123.pdf',
-      status: 'Created',
+      status: EApplicationStatus.Created,
       student: {
         id: 'student-1',
         name: 'Иван',
@@ -105,8 +71,8 @@ export const ApplicationModal = ({
         email: 'ivan.petrov@example.com',
         phone: '+7 (999) 123-45-67',
         isHeadMan: false,
-        status: 'InProcess',
-        internshipStatus: 'Candidate',
+        status: EStudentStatus.InProcess,
+        internshipStatus: EInternshipStatus.GotInternship,
         groupNumber: 101,
         course: 3,
       },
@@ -114,7 +80,7 @@ export const ApplicationModal = ({
         id: 'company-1',
         name: 'ООО "Технологии Будущего"',
         description: 'Разработка программного обеспечения',
-        status: 'Partner',
+        status: ECompanyStatus.Partner,
       },
       position: {
         id: 'position-1',
@@ -144,7 +110,8 @@ export const ApplicationModal = ({
     if (applicationDetail) {
       setApplicationDetail({
         ...applicationDetail,
-        status: newStatus as never,
+
+        status: newStatus as unknown as EApplicationStatus,
       });
     }
 
@@ -156,15 +123,24 @@ export const ApplicationModal = ({
   };
 
   // Функции для получения бейджей статусов
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: EApplicationStatus) => {
     const statusConfig = {
-      Created: { label: 'Создана', variant: 'secondary' as const },
-      UnderConsideration: {
+      [EApplicationStatus.Created]: {
+        label: 'Создана',
+        variant: 'secondary' as const,
+      },
+      [EApplicationStatus.UnderConsideration]: {
         label: 'На рассмотрении',
         variant: 'default' as const,
       },
-      Rejected: { label: 'Отклонена', variant: 'destructive' as const },
-      Accepted: { label: 'Принята', variant: 'default' as const },
+      [EApplicationStatus.Rejected]: {
+        label: 'Отклонена',
+        variant: 'destructive' as const,
+      },
+      [EApplicationStatus.Accepted]: {
+        label: 'Принята',
+        variant: 'default' as const,
+      },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig];
@@ -184,17 +160,26 @@ export const ApplicationModal = ({
 
   const getStudentStatusBadge = (status: string) => {
     const statusConfig = {
-      Expelled: { label: 'Отчислен', variant: 'destructive' as const },
+      Expelled: {
+        label: 'Отчислен',
+        variant: 'destructive' as const,
+        className: '',
+      },
       OnAcademicLeave: {
         label: 'Академический отпуск',
         variant: 'secondary' as const,
+        className: '',
       },
       InProcess: {
         label: 'Обучается',
         variant: 'default' as const,
         className: 'bg-green-100 text-green-800 hover:bg-green-200',
       },
-      Transferred: { label: 'Переведен', variant: 'secondary' as const },
+      Transferred: {
+        label: 'Переведен',
+        variant: 'secondary' as const,
+        className: '',
+      },
       Graduated: {
         label: 'Выпускник',
         variant: 'default' as const,
@@ -204,7 +189,10 @@ export const ApplicationModal = ({
 
     const config = statusConfig[status as keyof typeof statusConfig];
     return (
-      <Badge variant={config?.variant || 'secondary'}>
+      <Badge
+        variant={config?.variant || 'secondary'}
+        className={config?.className}
+      >
         {config?.label || status}
       </Badge>
     );
@@ -212,7 +200,11 @@ export const ApplicationModal = ({
 
   const getInternshipStatusBadge = (status: string) => {
     const statusConfig = {
-      Small: { label: 'Не достиг 2 курса', variant: 'secondary' as const },
+      Small: {
+        label: 'Не достиг 2 курса',
+        variant: 'secondary' as const,
+        className: '',
+      },
       Candidate: {
         label: 'В поиске',
         variant: 'default' as const,
@@ -395,7 +387,7 @@ export const ApplicationModal = ({
                 Изменить статус:
               </Label>
               <Select
-                value={applicationDetail.status}
+                value={applicationDetail.status.toString()}
                 onValueChange={updateApplicationStatus}
                 disabled={statusUpdating}
               >

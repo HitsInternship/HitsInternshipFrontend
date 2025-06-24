@@ -15,6 +15,7 @@ import {
 import { useCuratorData, useDeanMemberData } from '@/entities/User/hooks';
 import { useStores } from '@/shared/contexts';
 import { UserRole } from '@/entities/User/models';
+import { CreateEmployee } from '@/features/CreateEmployee';
 
 export const EmployeeProfilePage = observer(() => {
   const {
@@ -71,14 +72,12 @@ export const EmployeeProfilePage = observer(() => {
         </CardContent>
       </Card>
 
-      {/* <div className='mt-8'>
+      <div className='mt-8'>
         <h2 className='text-xl font-semibold mb-4'>Быстрые действия</h2>
         <div className='grid grid-cols-1 sm:grid-cols-2  gap-4'>
-          <CreateStudent />
-
           <CreateEmployee />
         </div>
-      </div> */}
+      </div>
     </PageLayout>
   );
 });

@@ -1,2 +1,2 @@
 export { api } from './axiosInstance';
-export type { RequestConfig } from './types';
+export type { RequestConfig, BaseMutationParams } from './types';

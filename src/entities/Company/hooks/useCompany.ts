@@ -7,4 +7,9 @@ export const useCompany = (companyId: string) =>
     queryKey: ['company', companyId],
     queryFn: () => getCompany({ params: { id: companyId } }),
     select: (data) => data.data,
+    staleTime: Infinity,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });

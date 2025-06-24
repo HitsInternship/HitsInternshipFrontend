@@ -8,8 +8,10 @@ import { ApplicationModal } from '@/widgets/ApplicationModal';
 
 export const ApplicationCard = (application: IApplication) => {
   const [isModalOpen, setIsModelOpen] = useState(false);
+
   const getStatusBadge = (status: EApplicationStatus) => {
-    const statusConfig: Record<EApplicationStatus, any> = {
+    console.log(status);
+    const statusConfig = {
       [EApplicationStatus.Created]: {
         label: 'Создана',
         variant: 'secondary' as const,
@@ -26,10 +28,10 @@ export const ApplicationCard = (application: IApplication) => {
         label: 'Принята',
         variant: 'default' as const,
       },
-      [EApplicationStatus.null]: undefined,
     };
 
-    const config = statusConfig[status];
+    const config = statusConfig[status as keyof typeof statusConfig];
+    console.log(status);
 
     return (
       <Badge

@@ -3,6 +3,7 @@ export type {
   IVacancyList,
   CreateVacancyFormData,
   IVacancyInfo,
+  VacancyFilters,
 } from './models';
 export { useVacancies } from './hooks/useVacancies';
 export { useCreateVacancy } from './hooks/useCreateVacancy';

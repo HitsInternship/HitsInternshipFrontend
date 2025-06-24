@@ -18,21 +18,19 @@ export enum UserRole {
 }
 
 export interface IUser {
+  id: string;
   name: string;
   surname: string;
   email: string;
 }
 export interface IDeanMember extends IUser {
-  id: string;
   isDeleted: boolean;
 }
 export interface ICurator extends IUser {
-  id: string;
   telegram: string;
   phone: string;
 }
 export interface IStudent extends IUser {
-  id: string;
   middlename: string;
   phone: string;
   isHeadMan: string;

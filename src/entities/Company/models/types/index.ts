@@ -1,1 +1,7 @@
-export { type Company, ECompanyStatus } from './types';
+export type {
+  Company,
+  CreateCompanyDTO,
+  UpdateCompanyDTO,
+  ChangeCompanyStatusParams,
+} from './types';
+export { ECompanyStatus } from './types';

@@ -6,15 +6,18 @@ import { Page } from '../Page';
 import { StoresProvider } from '@/shared/contexts';
 import { UserStore } from '@/entities/User/models';
 import { CompanyStore } from '@/entities/Company/models';
+import { SelectionStore } from '@/entities/Selection';
 
 export const App = () => {
   const queryClient = new QueryClient();
   const userStore = new UserStore();
   const companyStore = new CompanyStore();
+  const selectionStore = new SelectionStore();
 
   const stores = {
     userStore,
     companyStore,
+    selectionStore,
   };
 
   return (

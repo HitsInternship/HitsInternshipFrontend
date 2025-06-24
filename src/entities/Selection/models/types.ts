@@ -1,7 +1,7 @@
 export enum SelectionStatus {
   InProgress = 'InProgress',
   Inactive = 'Inactive',
-  OfferAccepted = 'OfferAccepted',
+  OfferAccepted = 'OffersAccepted',
 }
 
 export interface Candidate {

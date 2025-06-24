@@ -101,7 +101,7 @@ export const mockData: ApplicationListResponse = {
   ],
   pagination: {
     size: 10,
-    count: 2,
+    count: 1,
     current: 1,
   },
 };

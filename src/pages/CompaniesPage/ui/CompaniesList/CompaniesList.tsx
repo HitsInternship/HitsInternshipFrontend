@@ -1,13 +1,11 @@
-import { Edit2Icon, UsersIcon } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { FileDown } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { CompanyListSkeleton } from '../CompaniesListSkeleton';
 
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -15,10 +13,15 @@ import {
 } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { useStores } from '@/shared/contexts';
-import { ROUTER_PATHS } from '@/shared/consts';
 import { CompanyStatusBadge } from '@/shared/components/CompanyStatusBadge';
 import { UserRole } from '@/entities/User/models';
 import { useCompaniesList } from '@/entities/Company';
+import { useDownloadInternsByCompany } from '@/entities/Practice/hooks/useDownloadInternsByCompany';
+import { CompanyDetailsModal } from '@/pages/CompaniesPage/ui/CompanyDetails/CompanyDetails.tsx';
+import { EditCompanyDialog } from '@/pages/CompaniesPage/ui/EditCompanyDialog';
+import { CreateCuratorModal } from '@/pages/CompaniesPage/ui/CreateCuratorDialog/CreateCuratorDialog.tsx';
+import { ECompanyStatus } from '@/entities/Company/models';
+import { useCuratorInfo } from '@/entities/Curators/hooks/useCuratorInfo.ts';
 
 export const CompaniesList = observer(() => {
   const {
@@ -26,17 +29,35 @@ export const CompaniesList = observer(() => {
     userStore: { roles },
   } = useStores();
 
-  const isStudent = roles.includes(UserRole.Student);
+  const { isDeanMember, isStudent, isCurator, isAdmin } = useMemo(() => {
+    const isDeanMember =
+      roles.includes(UserRole.DeanMember) && roles.length === 1;
+    const isStudent = roles.includes(UserRole.Student) && roles.length === 1;
+    const isCurator = roles.includes(UserRole.Curator) && roles.length === 1;
+    const isAdmin = !isDeanMember && !isStudent && !isCurator;
+    return { isDeanMember, isStudent, isCurator, isAdmin };
+  }, [roles]);
+
+  const { data: curatorInfo, isLoading: curatorLoading } =
+    useCuratorInfo(isCurator);
 
   const { data, isLoading } = useCompaniesList();
+  const { mutate } = useDownloadInternsByCompany();
 
   useEffect(() => {
-    if (data !== undefined) {
-      setCompanies(data);
+    if (data) {
+      if (isStudent || isCurator) {
+        const filteredCompanies = data.filter(
+          (company) => company.status === ECompanyStatus.Partner,
+        );
+        setCompanies(filteredCompanies);
+      } else {
+        setCompanies(data);
+      }
     }
-  }, [data, setCompanies]);
+  }, [data, isStudent, isCurator, setCompanies]);
 
-  if (isLoading) {
+  if (isLoading || curatorLoading) {
     return <CompanyListSkeleton />;
   }
 
@@ -52,37 +73,51 @@ export const CompaniesList = observer(() => {
   }
 
   return (
-    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+    <div
+      className='grid gap-4 md:gap-6'
+      style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))' }}
+    >
       {companies.map((company) => (
-        <Card key={company.id} className='flex flex-col'>
-          <CardHeader>
-            <div className='flex justify-between items-start'>
-              <CardTitle className='text-xl'>{company.name}</CardTitle>
-              <CompanyStatusBadge status={company.status} />
+        <Card key={company.id} className='flex flex-col min-w-0'>
+          <CardHeader className='pb-3'>
+            <div className='flex justify-between'>
+              <div className='flex flex-col gap-2'>
+                <div className='flex flex-row items-center gap-2'>
+                  <CardTitle className='text-lg sm:text-xl max-w-40 leading-tight truncate'>
+                    {company.name}
+                  </CardTitle>
+                </div>
+                <CompanyStatusBadge
+                  status={company.status}
+                  editingEnabled={isDeanMember}
+                  companyId={company.id}
+                  underCuratorControl={
+                    company.id === curatorInfo?.companyId && isCurator
+                  }
+                />
+                <CardDescription className='line-clamp-2 h-10 text-sm'>
+                  {company.description || 'Нет описания'}
+                </CardDescription>
+              </div>
+              <div className='flex align-left'>
+                {isDeanMember && <EditCompanyDialog company={company} />}
+                {isDeanMember && <CreateCuratorModal company={company} />}
+              </div>
             </div>
-            <CardDescription className='line-clamp-2 h-10'>
-              {company.description || 'Нет описания'}
-            </CardDescription>
           </CardHeader>
-          <CardContent className='flex-grow'>
-            {/* Место для доп контента (?) */}
-          </CardContent>
-          <CardFooter className='flex justify-between pt-4 border-t'>
-            <Button variant='outline' asChild>
-              <Link to={`/companies/${company.id}`}>
-                <UsersIcon className='mr-2 h-4 w-4' />
-                Подробнее
-              </Link>
-            </Button>
-            {!isStudent && (
-              <Button variant='outline' asChild>
-                <Link to={ROUTER_PATHS.EDIT_COMPANY(company.id)}>
-                  <Edit2Icon className='mr-2 h-4 w-4' />
-                  Редактировать
-                </Link>
+          {(isDeanMember || isAdmin) && (
+            <CardFooter className='flex-col justify-between pt-4 border-t gap-2'>
+              <CompanyDetailsModal company={company} />
+              <Button
+                variant='outline'
+                className='w-full'
+                onClick={() => mutate(company)}
+              >
+                <FileDown className='mr-2 h-4 w-4' />
+                Скачать практикантов
               </Button>
-            )}
-          </CardFooter>
+            </CardFooter>
+          )}
         </Card>
       ))}
     </div>
