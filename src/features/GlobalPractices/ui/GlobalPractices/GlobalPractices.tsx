@@ -3,6 +3,7 @@ import { Calendar, Download, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { DocumentType } from '../../models';
+import { PotentialPractices } from '../PotentialPractices';
 
 import { useGlobalPractices } from '@/entities/Practice';
 import { CreatePracticeDialog } from '@/features/CreatePracticeDialog';
@@ -61,6 +62,8 @@ export const GlobalPractices = () => {
           open={isCreateDialogOpen}
           setIsCreateDialogOpen={setIsCreateDialogOpen}
         />
+
+        <PotentialPractices />
       </div>
       <div className='space-y-4'>
         {globalPractices &&

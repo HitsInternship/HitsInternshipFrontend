@@ -4,3 +4,4 @@ export {
   useStudentCharacteristics,
   useAddCharacteristicComment,
 } from './hooks';
+export type { Commentary } from './models';

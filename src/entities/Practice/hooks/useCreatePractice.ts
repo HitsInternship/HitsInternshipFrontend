@@ -11,7 +11,7 @@ export const useCreatePractice = () => {
     {
       practiceType: string;
       semesterId: string;
-      previousSemesterId: string;
+      lastSemesterId: string;
       streamId: string;
       diaryPatternFile: File;
       characteristicsPatternFile: File;
@@ -20,7 +20,7 @@ export const useCreatePractice = () => {
     mutationFn: ({
       practiceType,
       semesterId,
-      previousSemesterId,
+      lastSemesterId,
       streamId,
       diaryPatternFile,
       characteristicsPatternFile,
@@ -28,7 +28,7 @@ export const useCreatePractice = () => {
       createPractice(
         practiceType,
         semesterId,
-        previousSemesterId,
+        lastSemesterId,
         streamId,
         diaryPatternFile,
         characteristicsPatternFile,

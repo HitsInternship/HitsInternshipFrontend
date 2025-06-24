@@ -63,7 +63,7 @@ export const CreatePracticeDialog = ({
     createNewPractice({
       practiceType: 'Technological',
       semesterId: newInternship.semester,
-      previousSemesterId: newInternship.previousSemester,
+      lastSemesterId: newInternship.previousSemester,
       streamId: newInternship.stream,
       diaryPatternFile: newInternship.diaryTemplate,
       characteristicsPatternFile: newInternship.characteristicTemplate,

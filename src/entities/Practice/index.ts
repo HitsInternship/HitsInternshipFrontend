@@ -1,4 +1,4 @@
-export type { GlobalPracticeData } from './models';
+export type { GlobalPracticeData, Practice } from './models';
 
 export {
   useGlobalPractices,
@@ -6,4 +6,5 @@ export {
   useCreatePractice,
   usePractices,
   useStudentPractice,
+  usePotentialPractices,
 } from './hooks';

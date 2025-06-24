@@ -3,7 +3,7 @@ import { api } from '@/shared/api';
 export const createPractice = async (
   practiceType: string,
   semesterId: string,
-  previousSemesterId: string,
+  lastSemesterId: string,
   streamId: string,
   diaryPatternFile: File,
   characteristicsPatternFile: File,
@@ -17,7 +17,7 @@ export const createPractice = async (
     params: {
       practiceType,
       semesterId,
-      previousSemesterId,
+      lastSemesterId,
       streamId,
     },
     headers: {

@@ -1,1 +1,1 @@
-export type { StudentPracticeDiary } from './types';
+export type { StudentPracticeDiary, Comment } from './types';

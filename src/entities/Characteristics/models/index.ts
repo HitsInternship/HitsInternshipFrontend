@@ -1,1 +1,1 @@
-export type { StudentCharacteristic } from './types';
+export type { StudentCharacteristic, Commentary } from './types';

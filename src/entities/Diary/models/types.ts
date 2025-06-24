@@ -1,13 +1,15 @@
 export interface Comment {
+  comment: string;
+  diaryId: string;
   id: string;
-  text: string;
+  isDeleted: boolean;
 }
 
 export interface StudentPracticeDiary {
   documentId: string;
   practice: string | null;
   practiceId: string;
-  practiceComment: Comment[];
+  comment: Comment[];
   id: string;
   isDeleted: boolean;
 }

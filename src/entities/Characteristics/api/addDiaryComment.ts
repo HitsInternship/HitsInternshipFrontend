@@ -4,7 +4,7 @@ export const addDiaryComment = async (
   diaryId: string,
   comment: string,
 ): Promise<void> => {
-  await api.post(`/api/diary/student-practice-diary/${diaryId}`, {
+  await api.post(`/api/diary/practice-diary/${diaryId}/comments`, {
     comment,
   });
 };

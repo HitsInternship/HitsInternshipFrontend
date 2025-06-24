@@ -18,7 +18,7 @@ export interface GlobalPracticeData {
 export interface Practice {
   id: string;
   studentId: string;
-  studentFullName: string;
+  studentFullName: string | null;
   mark: number | null;
   practiceDiaryId: string | null;
   characteristicsId: string | null;
@@ -28,8 +28,21 @@ export interface StudentPractice {
   semesterId: string;
   semesterStartDate: string;
   semesterEndDate: string;
-  practiceType: string;
+  practiceType: number;
   diaryPatternDocumentId: string;
   characteristicsPatternDocumentId: string;
   practice: Practice;
+}
+
+export interface PotentialPractice {
+  studentId: string;
+  studentFullName: string;
+  companyId: string | null;
+  companyName: string | null;
+  positionId: string | null;
+  positionName: string | null;
+  newCompanyId: string | null;
+  newCompanyName: string | null;
+  newPositionId: string | null;
+  newPositionName: string | null;
 }

@@ -1,1 +1,6 @@
-export type { GlobalPracticeData, StudentPractice } from './types';
+export type {
+  GlobalPracticeData,
+  StudentPractice,
+  Practice,
+  PotentialPractice,
+} from './types';
