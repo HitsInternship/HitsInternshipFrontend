@@ -23,6 +23,8 @@ import {
   useUploadCharacteristics,
 } from '@/entities/Characteristics';
 import { useStudentDiaryById, useUploadPracticeDiary } from '@/entities/Diary';
+import { DocumentType } from '@/entities/Document';
+import { getDocumentById } from '@/entities/Document/api';
 
 export const PracticeItem = ({
   practiceData,
@@ -105,14 +107,14 @@ export const PracticeItem = ({
     input.click();
   };
 
-  const handleDownloadTemplate = (
+  const handleDownloadTemplate = async (
     patternDocumentId: string,
-    type: 'diary' | 'characteristic',
+    type: DocumentType,
   ) => {
-    // Здесь будет логика скачивания шаблона по ID
-    console.log(
-      `Скачивание шаблона ${type === 'diary' ? 'дневника' : 'характеристики'} с ID: ${patternDocumentId}`,
-    );
+    await getDocumentById({
+      params: { documentId: patternDocumentId },
+      documentType: type,
+    });
   };
 
   const getGradeText = (mark: number | null) => {
@@ -224,7 +226,7 @@ export const PracticeItem = ({
                     onClick={() =>
                       handleDownloadTemplate(
                         practiceData.diaryPatternDocumentId,
-                        'diary',
+                        DocumentType.PracticeDiary,
                       )
                     }
                   >
@@ -290,7 +292,7 @@ export const PracticeItem = ({
                     onClick={() =>
                       handleDownloadTemplate(
                         practiceData.characteristicsPatternDocumentId,
-                        'characteristic',
+                        DocumentType.StudentPracticeCharacteristic,
                       )
                     }
                   >

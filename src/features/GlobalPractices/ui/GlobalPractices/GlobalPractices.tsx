@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Calendar, Download, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import { DocumentType } from '../../models';
 import { PotentialPractices } from '../PotentialPractices';
 
 import { useGlobalPractices } from '@/entities/Practice';
@@ -23,6 +22,8 @@ import {
   AccordionTrigger,
 } from '@/shared/ui/accordion';
 import { ROUTER_PATHS } from '@/shared/consts';
+import { DocumentType } from '@/entities/Document';
+import { getDocumentById } from '@/entities/Document/api';
 
 export const GlobalPractices = () => {
   const navigate = useNavigate();
@@ -40,8 +41,11 @@ export const GlobalPractices = () => {
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
-  const handleDownloadTemplate = (id: string, type: DocumentType) => {
-    console.log(id, type);
+  const handleDownloadTemplate = async (id: string, type: DocumentType) => {
+    await getDocumentById({
+      params: { documentId: id },
+      documentType: type,
+    });
   };
 
   const handleOpenPractice = (practiceId: string) => {

@@ -12,6 +12,10 @@ import { useState } from 'react';
 import { Badge, Button, Input } from '@/shared/ui';
 import { TableCell, TableRow } from '@/shared/ui/table';
 import { Practice, useChangePracticeMark } from '@/entities/Practice';
+import { DocumentType } from '@/entities/Document';
+import { getDocumentById } from '@/entities/Document/api';
+import { useStudentCharacteristicById } from '@/entities/Characteristics';
+import { useStudentDiaryById } from '@/entities/Diary';
 
 export const StudentPractice = ({
   practice,
@@ -28,10 +32,10 @@ export const StudentPractice = ({
   >;
 }) => {
   const { mutate: changeMark } = useChangePracticeMark();
-  /*const { data: diary } = useStudentDiaryById(practice.practiceDiaryId);
+  const { data: diary } = useStudentDiaryById(practice.practiceDiaryId);
   const { data: characteristic } = useStudentCharacteristicById(
     practice.characteristicsId,
-  );*/
+  );
 
   const [editingGrade, setEditingGrade] = useState<{
     practiceId: string | null;
@@ -41,11 +45,19 @@ export const StudentPractice = ({
     value: '5',
   });
 
-  const handleDownloadDocument = (
-    documentId: string,
-    type: 'diary' | 'characteristics',
-  ) => {
-    console.log(`Скачивание ${type}:`, documentId);
+  const handleDownloadDocument = async (type: DocumentType) => {
+    const id =
+      type === DocumentType.PracticeDiary
+        ? diary?.documentId
+        : characteristic?.documentId;
+    if (id) {
+      await getDocumentById({
+        params: {
+          documentId: id,
+        },
+        documentType: type,
+      });
+    }
   };
 
   const handleAddComment = (type: 'diary' | 'characteristics') => {
@@ -57,7 +69,6 @@ export const StudentPractice = ({
           : practice.characteristicsId,
       type,
       comment: '',
-      //comments: type === 'diary' ? diary!.comment : characteristic!.comment,
     });
   };
 
@@ -160,9 +171,7 @@ export const StudentPractice = ({
             <Button
               variant='outline'
               size='sm'
-              onClick={() =>
-                handleDownloadDocument(practice.practiceDiaryId!, 'diary')
-              }
+              onClick={() => handleDownloadDocument(DocumentType.PracticeDiary)}
             >
               <FileText className='w-4 h-4 mr-1' />
               <Download className='w-3 h-3' />
@@ -187,8 +196,7 @@ export const StudentPractice = ({
               size='sm'
               onClick={() =>
                 handleDownloadDocument(
-                  practice.characteristicsId!,
-                  'characteristics',
+                  DocumentType.StudentPracticeCharacteristic,
                 )
               }
             >
