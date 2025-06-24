@@ -25,6 +25,8 @@ export const EmployeeProfilePage = observer(() => {
   const { data: deanMemberData } = useDeanMemberData();
   const { data: curatorData } = useCuratorData();
 
+  const isDeanMember = roles.includes(UserRole.DeanMember);
+
   if (!deanMemberData && !curatorData) {
     return null;
   }
@@ -72,12 +74,14 @@ export const EmployeeProfilePage = observer(() => {
         </CardContent>
       </Card>
 
-      <div className='mt-8'>
-        <h2 className='text-xl font-semibold mb-4'>Быстрые действия</h2>
-        <div className='grid grid-cols-1 sm:grid-cols-2  gap-4'>
-          <CreateEmployee />
+      {isDeanMember && (
+        <div className='mt-8'>
+          <h2 className='text-xl font-semibold mb-4'>Быстрые действия</h2>
+          <div className='grid grid-cols-1 sm:grid-cols-2  gap-4'>
+            <CreateEmployee />
+          </div>
         </div>
-      </div>
+      )}
     </PageLayout>
   );
 });

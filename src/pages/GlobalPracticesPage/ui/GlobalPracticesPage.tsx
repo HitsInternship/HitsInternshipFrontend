@@ -12,9 +12,5 @@ export const GlobalPracticesPage = observer(() => {
 
   const isDeanMember = roles.includes(UserRole.DeanMember);
 
-  return (
-    <div className='container mx-auto p-6 space-y-6'>
-      {isDeanMember ? <GlobalPractices /> : <StudentPractice />}
-    </div>
-  );
+  return isDeanMember ? <GlobalPractices /> : <StudentPractice />;
 });

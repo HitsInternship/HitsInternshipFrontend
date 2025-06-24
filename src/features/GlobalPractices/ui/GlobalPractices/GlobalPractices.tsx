@@ -14,6 +14,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  PageLayout,
 } from '@/shared/ui';
 import {
   Accordion,
@@ -53,21 +54,24 @@ export const GlobalPractices = () => {
   };
 
   return (
-    <>
-      <div className='flex justify-between items-center'>
-        <div>
-          <h1 className='text-3xl font-bold'>Глобальные практики</h1>
-          <p className='text-muted-foreground'>
-            Управление практиками по семестрам
-          </p>
-        </div>
-
+    <PageLayout
+      title='Глобальные практики'
+      subTitle='Управление практиками по семестрам'
+    >
+      <div className='flex gap-3 items-center mb-3'>
         <CreatePracticeDialog
           open={isCreateDialogOpen}
           setIsCreateDialogOpen={setIsCreateDialogOpen}
         />
 
         <PotentialPractices />
+
+        <Button
+          variant='outline'
+          onClick={() => navigate(ROUTER_PATHS.CHANGE_PRACTICE)}
+        >
+          Заявки на смену практики
+        </Button>
       </div>
       <div className='space-y-4'>
         {globalPractices &&
@@ -158,6 +162,6 @@ export const GlobalPractices = () => {
             </Card>
           ))}
       </div>
-    </>
+    </PageLayout>
   );
 };
