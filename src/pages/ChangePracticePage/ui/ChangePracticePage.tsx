@@ -44,6 +44,7 @@ export const ChangePracticePage = () => {
   });
 
   const isDeanMember = roles.includes(UserRole.DeanMember);
+  const isStudent = roles.includes(UserRole.Student);
 
   // const [filtersChanged, setFiltersChanged] = useState(false);
 
@@ -71,7 +72,7 @@ export const ChangePracticePage = () => {
     // setFiltersChanged(true);
   };
 
-  const successCreate = () => {
+  const update = () => {
     setFilters({
       isArchived: false,
       page: 1,
@@ -107,17 +108,20 @@ export const ChangePracticePage = () => {
         'Управление заявками студентов на изменение места прохождения практики'
       }
     >
-      <Button
-        onClick={() => setShowCreateModal(true)}
-        className='flex items-center gap-2 mb-4'
-      >
-        <Plus className='h-4 w-4' />
-        Заявка
-      </Button>
+      {isStudent && (
+        <Button
+          onClick={() => setShowCreateModal(true)}
+          className='flex items-center gap-2 mb-4'
+        >
+          <Plus className='h-4 w-4' />
+          Заявка
+        </Button>
+      )}
+
       <CreateApplicationModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        onSuccess={successCreate}
+        onSuccess={update}
       />
       <Card className='mb-3'>
         <CardHeader>
@@ -207,7 +211,7 @@ export const ChangePracticePage = () => {
           </Card>
         ) : (
           data?.applications.map((application) => (
-            <ApplicationCard {...application} />
+            <ApplicationCard application={application} onSuccess={update} />
           ))
         )}
       </div>

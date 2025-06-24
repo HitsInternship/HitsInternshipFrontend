@@ -55,7 +55,7 @@ export interface EditStudentStatusDTO {
 
 export interface CreateStudentDTO {
   password: string;
-  userRequest?: IUser;
+  userRequest?: Omit<IUser, 'id'>;
   userId?: string;
   middlename: string;
   phone: string;

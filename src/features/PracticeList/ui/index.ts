@@ -1,1 +1,0 @@
-export { PracticeList } from './PracticeList';

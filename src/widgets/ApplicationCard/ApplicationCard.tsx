@@ -10,14 +10,17 @@ import {
 import { useState } from 'react';
 
 import { CommentsModal } from '../CommentsModal/CommentsModal';
+import { IApplicationCardProps } from './ApplicationCard.interfaces';
 
-import { IApplication } from '@/entities/Application';
 import { EApplicationStatus } from '@/entities/Application/models/types';
 import { Badge, Button, Card, CardContent } from '@/shared/ui';
 import { ApplicationModal } from '@/widgets/ApplicationModal';
 import { Separator } from '@/shared/ui/separator';
 
-export const ApplicationCard = (application: IApplication) => {
+export const ApplicationCard = ({
+  application,
+  onSuccess,
+}: IApplicationCardProps) => {
   const [isModalOpen, setIsModelOpen] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 
@@ -196,6 +199,7 @@ export const ApplicationCard = (application: IApplication) => {
         applicationId={application.id}
         isOpen={isModalOpen}
         onClose={() => setIsModelOpen(false)}
+        onSuccess={onSuccess}
       />
       <CommentsModal
         applicationId={application.id}

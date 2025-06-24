@@ -8,11 +8,11 @@ export interface IHeaderItem {
 }
 
 export const HeaderItems: IHeaderItem[] = [
-  {
-    name: 'Профиль',
-    link: ROUTER_PATHS.PROFILE,
-    roles: [UserRole.Curator, UserRole.DeanMember, UserRole.Student],
-  },
+  // {
+  //   name: 'Профиль',
+  //   link: ROUTER_PATHS.PROFILE,
+  //   roles: [UserRole.Curator, UserRole.DeanMember, UserRole.Student],
+  // },
   // {
   //   name: 'Стажировки',
   //   link: ROUTER_PATHS.INTERNSHIP,
@@ -45,7 +45,7 @@ export const HeaderItems: IHeaderItem[] = [
   },
   {
     name: 'Практики',
-    link: ROUTER_PATHS.PRACTICE,
+    link: ROUTER_PATHS.PRACTICES,
     roles: [ UserRole.Curator, UserRole.DeanMember, UserRole.Student],
   },
 ];

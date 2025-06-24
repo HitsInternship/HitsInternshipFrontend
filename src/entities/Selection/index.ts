@@ -1,5 +1,5 @@
 export type { Selection, Offer, Candidate } from './models';
-export { SelectionStatus } from './models';
+export { SelectionStatus, SelectionStore } from './models';
 
 export { useSelections } from './hooks';
 

@@ -1,0 +1,1 @@
+export { getCompanyAgreements } from './getCompanyAgreements';

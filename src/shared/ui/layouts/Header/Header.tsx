@@ -1,5 +1,5 @@
-import { Menu } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Menu, User2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ReactElement } from 'react';
 import { observer } from 'mobx-react-lite';
 
@@ -10,6 +10,7 @@ import { HeaderItems } from './Header.constants';
 
 import { useStores } from '@/shared/contexts';
 import { useLogout } from '@/entities/User/hooks';
+import { ROUTER_PATHS } from '@/shared/consts';
 
 export const Header = observer(() => {
   const {
@@ -17,6 +18,7 @@ export const Header = observer(() => {
   } = useStores();
 
   const { mutate } = useLogout();
+  const navigate = useNavigate();
   const handleLogoutClick = ():void => {
     mutate()
   }
@@ -58,7 +60,8 @@ export const Header = observer(() => {
           <div className='w-full flex-1 md:w-auto md:flex-none'>
             {/* Здесь можно добавить поиск или другие элементы */}
           </div>
-          <nav className='flex items-center'>
+          <nav className='flex items-center gap-6'>
+          <User2 className='h-6 w-6' onClick={()=>navigate(ROUTER_PATHS.PROFILE)}/>
             <Button variant='outline' className='mr-2' onClick={handleLogoutClick}>
               Выйти
             </Button>

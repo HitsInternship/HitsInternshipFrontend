@@ -7,4 +7,9 @@ export const useCompaniesList = () =>
     queryFn: () => getCompanies({}),
     queryKey: ['companies'],
     select: (data) => data.data,
+    staleTime: Infinity,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });

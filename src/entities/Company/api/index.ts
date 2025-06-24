@@ -1,3 +1,5 @@
 export { getCompanies } from './getCompanies';
-export { getCompanyRepresentatives } from './getCompanyRepresentatives';
 export { getCompany } from './getCompany';
+export { createCompany } from './createCompany';
+export { editCompany } from './editCompany';
+export { updateCompanyStatus } from './updateCompanyStatus';

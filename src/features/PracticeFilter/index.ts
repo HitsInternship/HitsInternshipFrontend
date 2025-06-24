@@ -1,1 +1,0 @@
-export { PracticeFilter } from './ui';

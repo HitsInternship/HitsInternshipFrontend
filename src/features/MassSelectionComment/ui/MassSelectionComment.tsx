@@ -2,6 +2,8 @@ import { Send } from 'lucide-react';
 import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
+import { useCreateSelectionComment } from '../hooks';
+
 import {
   Button,
   Card,
@@ -12,12 +14,12 @@ import {
   Textarea,
 } from '@/shared/ui';
 import { RadioGroup, RadioGroupItem } from '@/shared/ui/radio-group';
-import { useCreateSelectionComment } from '@/features/MassSelectionComment/hooks/useCreateSelectionComment.ts';
 import { SelectionStatus } from '@/entities/Selection';
 
 export const MassSelectionComment = () => {
-  const [massCommentType, setMassCommentType] =
-    useState<SelectionStatus | null>(null);
+  const [massCommentType, setMassCommentType] = useState<
+    SelectionStatus | 'null'
+  >('null');
   const massCommentTextarea = useRef<HTMLTextAreaElement | null>(null);
 
   const { mutate, isPending } = useCreateSelectionComment({
@@ -33,8 +35,9 @@ export const MassSelectionComment = () => {
     if (massCommentTextarea.current?.value) {
       mutate({
         params: {
-          selectionStatus: massCommentType,
+          selectionStatus: massCommentType === 'null' ? null : massCommentType,
           content: massCommentTextarea.current?.value,
+          selectedUsers: [],
         },
       });
     }
@@ -52,7 +55,7 @@ export const MassSelectionComment = () => {
             <RadioGroup
               value={massCommentType}
               onValueChange={(value) => {
-                if (value === 'null') setMassCommentType(null);
+                if (value === 'null') setMassCommentType('null');
                 else setMassCommentType(value as SelectionStatus);
               }}
               className='flex flex-wrap gap-4 mt-2'
@@ -92,7 +95,7 @@ export const MassSelectionComment = () => {
             />
             <Button onClick={handleBulkSend} disabled={isPending}>
               <Send className='h-4 w-4 mr-2' />
-              {isPending ? 'Отправка' : 'Отправить'}
+              {isPending ? 'Отправка...' : 'Отправить'}
             </Button>
           </div>
         </div>

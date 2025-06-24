@@ -32,6 +32,7 @@ import {
   useApplicationFile,
   useApplicationInfo,
   useSendApplicationFile,
+  useUpdateApplicationStatus,
 } from '@/entities/Application';
 import { EApplicationStatus } from '@/entities/Application/models/types';
 import { Separator } from '@/shared/ui/separator';
@@ -42,16 +43,19 @@ interface ApplicationModalProps {
   applicationId: string;
   isOpen: boolean;
   onClose: () => void;
+  onSuccess: () => void;
 }
 
 export const ApplicationModal = ({
   applicationId,
   isOpen,
   onClose,
+  onSuccess,
 }: ApplicationModalProps) => {
   const [applicationDetail, setApplicationDetail] =
     useState<IApplicationDetails | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [fileLink, setFileLink] = useState<string | null>(null);
 
@@ -65,6 +69,7 @@ export const ApplicationModal = ({
   const { mutate } = useApplicationInfo();
   const { mutate: fileMutate } = useApplicationFile();
   const { mutate: sendFileMutate } = useSendApplicationFile();
+  const { mutate: updateStatusMutate } = useUpdateApplicationStatus();
 
   const sendFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
@@ -80,6 +85,7 @@ export const ApplicationModal = ({
 
   const fetchData = async () => {
     setDetailLoading(true);
+    setFileLoading(true);
 
     mutate(applicationId, {
       onSuccess: (result) => {
@@ -95,9 +101,11 @@ export const ApplicationModal = ({
     fileMutate(applicationId, {
       onSuccess: (result) => {
         setFileLink(result);
+        setFileLoading(false);
       },
       onError: () => {
         toast.error('Ошибка загрузки файла');
+        setFileLoading(false);
       },
     });
   };
@@ -105,28 +113,27 @@ export const ApplicationModal = ({
   // Функция для обновления статуса заявки
   const updateApplicationStatus = async (newStatus: string) => {
     setStatusUpdating(true);
-    // Здесь будет реальный API запрос
-    // const response = await fetch(`/api/applications/${applicationId}/status`, {
-    //   method: 'PATCH',
-    //   body: JSON.stringify({ status: newStatus })
-    // })
 
-    // Имитация загрузки
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    if (applicationDetail) {
-      setApplicationDetail({
-        ...applicationDetail,
-
+    updateStatusMutate(
+      {
+        id: applicationId,
         status: newStatus as unknown as EApplicationStatus,
-      });
-    }
+      },
+      {
+        onSuccess() {
+          if (applicationDetail) {
+            setApplicationDetail({
+              ...applicationDetail,
+
+              status: newStatus as unknown as EApplicationStatus,
+            });
+          }
+          onSuccess();
+        },
+      },
+    );
 
     setStatusUpdating(false);
-    // Вызываем callback для обновления списка заявок
-    // if (onStatusUpdate) {
-    //   onStatusUpdate();
-    // }
   };
 
   // Функции для получения бейджей статусов
@@ -237,8 +244,6 @@ export const ApplicationModal = ({
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
     });
   };
 
@@ -259,7 +264,7 @@ export const ApplicationModal = ({
           </DialogTitle>
         </DialogHeader>
 
-        {detailLoading ? (
+        {detailLoading || fileLoading ? (
           <div className='flex items-center justify-center py-8'>
             <div className='w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin' />
             <span className='ml-2'>Загрузка...</span>
@@ -333,36 +338,35 @@ export const ApplicationModal = ({
                 </div>
               </div>
             ) : (
-              <div className='space-y-2'>
-                <Label htmlFor='document' className='text-sm font-medium'>
-                  Документ заявки <span className='text-red-500'>*</span>
-                </Label>
+              isStudent && (
                 <div className='space-y-2'>
-                  <div className='flex items-center gap-2 '>
-                    <Input
-                      id='document'
-                      type='file'
-                      accept='.pdf,.doc,.docx,.txt'
-                      onChange={sendFile}
-                      className='w-full file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/80'
-                    />
+                  <Label htmlFor='document' className='text-sm font-medium'>
+                    Документ заявки <span className='text-red-500'>*</span>
+                  </Label>
+                  <div className='space-y-2'>
+                    <div className='flex items-center gap-2 '>
+                      <Input
+                        id='document'
+                        type='file'
+                        accept='.pdf,.doc,.docx,.txt'
+                        onChange={sendFile}
+                        className='w-full file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/80'
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )
             )}
 
-            <div className='grid grid-cols-1 gap-6'>
+            <div className='grid grid-cols-1 gap-4'>
               {/* Подробная информация о студенте */}
               <div className='space-y-3'>
-                <div className='flex items-center gap-2 text-sm font-medium'>
+                <div className='flex items-center gap-2 font-medium'>
                   <User className='h-4 w-4' />
-                  Информация о студенте
+                  {`${applicationDetail.student.surname} ${applicationDetail.student.name} ${applicationDetail.student.middlename}`}
                 </div>
                 <div className='space-y-3'>
                   <div>
-                    <div className='font-medium'>
-                      {`${applicationDetail.student.surname} ${applicationDetail.student.name} ${applicationDetail.student.middlename}`}
-                    </div>
                     <div className='flex flex-row  gap-2 mt-1'>
                       {applicationDetail.student.isHeadMan && (
                         <Badge variant='outline' className='text-xs'>
@@ -396,37 +400,38 @@ export const ApplicationModal = ({
               </div>
 
               {/* Подробная информация о компании */}
-              <div className='space-y-3'>
-                <div className='flex items-center gap-2 text-sm font-medium'>
-                  <Building className='h-4 w-4' />
-                  Информация о компании
+              <div className='space-y-1'>
+                <div className='flex items-center gap-2  font-medium'>
+                  <Building className='h-4 w-4' /> Компания:{' '}
+                  {applicationDetail.newCompany.name}
                 </div>
-                <div className='space-y-2'>
+                {/* <div className='space-y-2'>
                   <div className='flex items-center gap-2'>
-                    <span className='font-medium'>
+                    <span className='font-medium flex'>
+                      <Building className='h-4 w-4' />
                       {applicationDetail.newCompany.name}
                     </span>
                   </div>
                   <p className='text-sm text-muted-foreground'>
                     {applicationDetail.newCompany.description}
                   </p>
-                </div>
+                </div> */}
               </div>
 
               {/* Подробная информация о позиции */}
               <div className='space-y-3'>
-                <div className='flex items-center gap-2 text-sm font-medium'>
-                  <Briefcase className='h-4 w-4' />
-                  Информация о позиции
+                <div className='flex items-center gap-2 font-medium'>
+                  <Briefcase className='h-4 w-4' /> Позиция:{' '}
+                  {applicationDetail.newPosition.name}
                 </div>
-                <div className='space-y-2'>
+                {/* <div className='space-y-2'>
                   <div className='font-medium'>
                     {applicationDetail.newPosition.name}
                   </div>
                   <p className='text-sm text-muted-foreground'>
                     {applicationDetail.newPosition.description}
                   </p>
-                </div>
+                </div> */}
               </div>
             </div>
             <Separator />
@@ -435,10 +440,12 @@ export const ApplicationModal = ({
                 Прошлое место:
               </div>
               <div>
-                <p className='text-sm t font-medium'>
+                <p className='text-sm t font-medium flex items-center gap-2'>
+                  <Building className='h-4 w-4' />
                   {applicationDetail.oldCompany.name}
                 </p>
-                <p className='text-sm t'>
+                <p className='text-sm t  flex items-center gap-2'>
+                  <Briefcase className='h-4 w-4' />
                   {applicationDetail.oldPosition.name}
                 </p>
               </div>
