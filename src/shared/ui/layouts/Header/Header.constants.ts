@@ -50,7 +50,7 @@ export const HeaderItems: IHeaderItem[] = [
   },
   {
     name: 'Практики',
-    link: ROUTER_PATHS.PRACTICE,
+    link: ROUTER_PATHS.PRACTICES,
     roles: [ UserRole.Curator, UserRole.DeanMember, UserRole.Student],
   },
 ];

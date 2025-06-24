@@ -1,16 +1,24 @@
 import { api, RequestConfig } from '@/shared/api';
 
-export type GetDocumentByIdConfig = RequestConfig<{ documentId: string }> & {
+export type GetDocumentByIdConfig = RequestConfig<{
+  documentId: string;
+}> & {
   filename?: string;
+  documentType?: string;
 };
 
 export const getDocumentById = async ({
   params,
   config,
   filename,
+  documentType,
 }: GetDocumentByIdConfig) => {
   const response = await api.get<Blob>(`/api/documents/${params.documentId}`, {
     responseType: 'blob',
+    params: {
+      ...config?.params,
+      ...(documentType ? { documentType } : {}),
+    },
     ...config,
   });
 
