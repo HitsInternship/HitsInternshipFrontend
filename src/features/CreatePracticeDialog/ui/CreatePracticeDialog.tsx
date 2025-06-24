@@ -1,5 +1,6 @@
 import { Plus, Upload } from 'lucide-react';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 import { CreatePracticeDialogProps } from './CreatePracticeDialog.interfaces';
 
@@ -22,24 +23,20 @@ import {
 } from '@/shared/ui';
 import { useSemesters } from '@/features/SemesterCRUD';
 import { useStreams } from '@/features/StreamsCRUD/hooks';
+import { useCreatePractice } from '@/entities/Practice';
 
 export const CreatePracticeDialog = ({
   open,
   setIsCreateDialogOpen,
 }: CreatePracticeDialogProps) => {
-  /*const mockStreams = [
-    'Информационные системы',
-    'Программная инженерия',
-    'Кибербезопасность',
-  ];
-  const mockSemesters = ['2024-1', '2024-2', '2025-1', '2025-2'];*/
   const { data: semesters = [] } = useSemesters(false);
   const { data: streams = [] } = useStreams();
+  const { mutate: createNewPractice } = useCreatePractice();
 
   const [newInternship, setNewInternship] = useState({
-    name: '',
     stream: '',
     semester: '',
+    previousSemester: '',
     diaryTemplate: null as File | null,
     characteristicTemplate: null as File | null,
   });
@@ -58,12 +55,25 @@ export const CreatePracticeDialog = ({
   };
 
   const handleCreateInternship = () => {
-    console.log('Создание практики:', newInternship);
+    if (!newInternship.diaryTemplate || !newInternship.characteristicTemplate) {
+      toast.error('Выберите оба файла');
+      return;
+    }
+
+    createNewPractice({
+      practiceType: 'Technological',
+      semesterId: newInternship.semester,
+      lastSemesterId: newInternship.previousSemester,
+      streamId: newInternship.stream,
+      diaryPatternFile: newInternship.diaryTemplate,
+      characteristicsPatternFile: newInternship.characteristicTemplate,
+    });
+
     setIsCreateDialogOpen(false);
     setNewInternship({
-      name: '',
       stream: '',
       semester: '',
+      previousSemester: '',
       diaryTemplate: null,
       characteristicTemplate: null,
     });
@@ -107,18 +117,6 @@ export const CreatePracticeDialog = ({
           </div>
 
           <div className='grid gap-2'>
-            <Label htmlFor='name'>Название практики</Label>
-            <Input
-              id='name'
-              value={newInternship.name}
-              onChange={(e) =>
-                setNewInternship((prev) => ({ ...prev, name: e.target.value }))
-              }
-              placeholder='Введите название практики'
-            />
-          </div>
-
-          <div className='grid gap-2'>
             <Label htmlFor='semester'>Семестр</Label>
             <Select
               value={newInternship.semester}
@@ -128,6 +126,30 @@ export const CreatePracticeDialog = ({
             >
               <SelectTrigger>
                 <SelectValue placeholder='Выберите семестр' />
+              </SelectTrigger>
+              <SelectContent>
+                {semesters.map((semester) => (
+                  <SelectItem key={semester.id} value={semester.id}>
+                    {semester.description}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className='grid gap-2'>
+            <Label htmlFor='previousSemester'>Предыдущий семестр</Label>
+            <Select
+              value={newInternship.previousSemester}
+              onValueChange={(value) =>
+                setNewInternship((prev) => ({
+                  ...prev,
+                  previousSemester: value,
+                }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder='Выберите предыдущий семестр' />
               </SelectTrigger>
               <SelectContent>
                 {semesters.map((semester) => (

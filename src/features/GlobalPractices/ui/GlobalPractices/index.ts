@@ -1,0 +1,1 @@
+export { GlobalPractices } from './GlobalPractices';

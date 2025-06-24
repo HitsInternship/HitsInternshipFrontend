@@ -1,1 +1,1 @@
-export { PracticeList } from './ui';
+export { PracticeList } from './ui/PracticeList';
