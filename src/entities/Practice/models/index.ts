@@ -3,4 +3,5 @@ export type {
   StudentPractice,
   Practice,
   PotentialPractice,
+  Statistics,
 } from './types';

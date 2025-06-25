@@ -7,4 +7,5 @@ export {
   usePractices,
   useStudentPractice,
   usePotentialPractices,
+  useStatistics,
 } from './hooks';

@@ -46,3 +46,9 @@ export interface PotentialPractice {
   newPositionId: string | null;
   newPositionName: string | null;
 }
+
+export interface Statistics {
+  [key: string]: {
+    [key: string]: number;
+  };
+}
