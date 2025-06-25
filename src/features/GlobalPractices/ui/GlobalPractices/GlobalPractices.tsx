@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Download, Users } from 'lucide-react';
+import { AlignEndHorizontal, Calendar, Download, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { PotentialPractices } from '../PotentialPractices';
@@ -71,6 +71,10 @@ export const GlobalPractices = () => {
           onClick={() => navigate(ROUTER_PATHS.CHANGE_PRACTICE)}
         >
           Заявки на смену практики
+        </Button>
+        <Button variant='outline' onClick={() => navigate(ROUTER_PATHS.STATS)}>
+          <AlignEndHorizontal />
+          Статистика
         </Button>
       </div>
       <div className='space-y-4'>

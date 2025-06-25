@@ -15,6 +15,7 @@ import { ChangePracticePage } from '@/pages/ChangePracticePage';
 import { SelectionsPage } from '@/pages/SelectionsPage';
 import { GlobalPracticesPage } from '@/pages/GlobalPracticesPage';
 import { PracticePage } from '@/pages/PracticePage';
+import { StatisticsPage } from '@/pages/StatisticsPage/StatisticsPage';
 
 export const Page: FC = observer(() => {
   return (
@@ -35,6 +36,7 @@ export const Page: FC = observer(() => {
         <Route path={ROUTER_PATHS.STUDENTS} element={<StudentsPage />} />
         <Route path={ROUTER_PATHS.VACANCIES} element={<VacanciesPage />} />
         <Route path={ROUTER_PATHS.VACANCY(':id')} element={<VacancyPage />} />
+        <Route path={ROUTER_PATHS.STATS} element={<StatisticsPage />} />
         <Route
           path={ROUTER_PATHS.CHANGE_PRACTICE}
           element={<ChangePracticePage />}
