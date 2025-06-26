@@ -4,3 +4,6 @@ export { useCuratorData } from './useCuratorData';
 export { useLogout } from './useLogout';
 export { useStudentData } from './useStudentData';
 export { useCreateDeanMember } from './useCreateDeanMember';
+export { useResetPassword } from './useResetPassword';
+export { useResetPasswordConfirm } from './useResetPasswordConfirm';
+export { useChangePassword } from './useChangePassword';
