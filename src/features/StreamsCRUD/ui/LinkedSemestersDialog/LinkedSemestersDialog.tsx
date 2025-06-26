@@ -176,7 +176,10 @@ export const LinkedSemestersDialog = ({
           >
             Закрыть
           </Button>
-          <Button onClick={() => handleAddLink(selectedStreamId || '')}>
+          <Button
+            onClick={() => handleAddLink(selectedStreamId || '')}
+            disabled={streamSemesters.length > 0}
+          >
             <PlusCircle className='mr-2 h-4 w-4' />
             Добавить связь
           </Button>

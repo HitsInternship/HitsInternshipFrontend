@@ -8,4 +8,6 @@ export interface StreamSemesterDialogProps {
   currentLinkId: string | null;
   semesters: Semester[];
   linkStreamId: string;
+  currentSemesterId: string | null;
+  currentLinkNumber: number | null;
 }

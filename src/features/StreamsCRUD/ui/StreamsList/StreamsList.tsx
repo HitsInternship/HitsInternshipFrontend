@@ -38,6 +38,8 @@ export const StreamsList = () => {
 
   const [linkStreamId, setLinkStreamId] = useState('');
   const [currentLinkId, setCurrentLinkId] = useState<string | null>(null);
+  const [linkSemesterId, setLinkSemesterId] = useState<string | null>(null);
+  const [linkNumber, setLinkNumber] = useState<number | null>(null);
 
   const handleAddStream = () => {
     setCurrentStream(null);
@@ -52,12 +54,16 @@ export const StreamsList = () => {
   const handleAddLink = (streamId: string) => {
     setLinkStreamId(streamId);
     setCurrentLinkId(null);
+    setLinkSemesterId('');
+    setLinkNumber(1);
     setIsLinkDialogOpen(true);
   };
 
   const handleEditLink = (link: StreamSemesterLink) => {
     setLinkStreamId(link.streamId);
     setCurrentLinkId(link.id);
+    setLinkSemesterId(link.semesterId);
+    setLinkNumber(link.number);
     setIsLinkDialogOpen(true);
   };
 
@@ -129,6 +135,8 @@ export const StreamsList = () => {
         currentLinkId={currentLinkId}
         semesters={semesters}
         linkStreamId={linkStreamId}
+        currentSemesterId={linkSemesterId}
+        currentLinkNumber={linkNumber}
       />
 
       <LinkedSemestersDialog
