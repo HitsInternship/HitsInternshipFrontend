@@ -14,6 +14,7 @@ import {
   Input,
   Button,
 } from '@/shared/ui';
+import { ResetPassword } from '@/features/ResetPassword';
 
 export const LoginForm = () => {
   const { mutate, isPending } = useLogin();
@@ -42,7 +43,7 @@ export const LoginForm = () => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className='flex flex-col gap-6'>
+          <div className='flex flex-col gap-6 mb-2'>
             <div className='grid gap-3'>
               <Label htmlFor='login'>Эл. почта</Label>
               <Controller
@@ -85,6 +86,7 @@ export const LoginForm = () => {
             </div>
           </div>
         </form>
+        <ResetPassword />
       </CardContent>
     </Card>
   );

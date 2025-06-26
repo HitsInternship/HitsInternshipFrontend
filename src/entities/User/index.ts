@@ -7,3 +7,9 @@ export type {
   ICurator,
   TUserInternshipStatus,
 } from './models';
+
+export {
+  useResetPassword,
+  useResetPasswordConfirm,
+  useChangePassword,
+} from './hooks';

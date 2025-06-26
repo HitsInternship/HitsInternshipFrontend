@@ -13,12 +13,13 @@ import {
 } from '@/shared/ui';
 import { useStudentData } from '@/entities/User/hooks';
 import { getStatusColor, getStatusText } from '@/entities/Student';
+import { ChangePassword } from '@/features/ChangePassword';
 
 export const StudentProfilePage = observer(() => {
   const { data } = useStudentData();
   return (
     <PageLayout title='Профиль'>
-      <Card>
+      <Card className='mb-4'>
         <CardHeader>
           <div className='flex flex-row justify-between'>
             <CardTitle className='text-2xl'>
@@ -89,6 +90,7 @@ export const StudentProfilePage = observer(() => {
           </div>
         </CardContent>
       </Card>
+      {data?.email && <ChangePassword email={data.email} />}
     </PageLayout>
   );
 });

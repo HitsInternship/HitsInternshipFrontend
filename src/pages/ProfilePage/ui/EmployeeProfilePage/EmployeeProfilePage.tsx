@@ -16,6 +16,7 @@ import { useCuratorData, useDeanMemberData } from '@/entities/User/hooks';
 import { useStores } from '@/shared/contexts';
 import { UserRole } from '@/entities/User/models';
 import { CreateEmployee } from '@/features/CreateEmployee';
+import { ChangePassword } from '@/features/ChangePassword';
 
 export const EmployeeProfilePage = observer(() => {
   const {
@@ -39,7 +40,7 @@ export const EmployeeProfilePage = observer(() => {
   };
   return (
     <PageLayout title='Профиль'>
-      <Card>
+      <Card className='mb-4'>
         <CardHeader className='pb-2'>
           <CardTitle className='text-2xl'>
             {profileData.name} {profileData.surname}
@@ -73,6 +74,8 @@ export const EmployeeProfilePage = observer(() => {
           </div>
         </CardContent>
       </Card>
+
+      {profileData.email && <ChangePassword email={profileData.email} />}
 
       {isDeanMember && (
         <div className='mt-8'>
