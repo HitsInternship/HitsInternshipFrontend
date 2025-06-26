@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Search, Mail, Phone, LoaderCircle, FilterX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
 
 import { getFullName } from './StudentPage.utils';
 import { CreateStudentModal } from '../CreateStudentModal';
@@ -36,14 +37,29 @@ import {
 } from '@/entities/Student/utils';
 import { ChangeStudentStatusDialog } from '@/pages/Student/ui/ChangeStudentStatusDialog';
 import { UploadStudentsModal } from '@/pages/Student/ui/UploadStudentsModal/UploadStudentsModal.tsx';
+import { UserRole } from '@/entities/User/models';
+import { useStores } from '@/shared/contexts';
 
-export const StudentsPage = () => {
+export const StudentsPage = observer(() => {
   const [selectedStreamId, setSelectedStreamId] = useState('');
   const [selectedGroupId, setSelectedGroupId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState<'stream' | 'group'>(
     'stream',
   );
+
+  const {
+    userStore: { roles },
+  } = useStores();
+
+  const { isDean } = useMemo(() => {
+    const isDean = roles.includes(UserRole.DeanMember) && roles.length === 1;
+    const isStudent = roles.includes(UserRole.Student) && roles.length === 1;
+    const isCurator = roles.includes(UserRole.Curator) && roles.length === 1;
+    const isAdmin = !isDean && !isStudent && !isCurator;
+    return { isDean, isStudent, isCurator, isAdmin };
+  }, [roles]);
+
   const navigate = useNavigate();
 
   const { data: streams, isLoading: isLoadingStreams } = useStreams();
@@ -100,10 +116,12 @@ export const StudentsPage = () => {
   return (
     <PageLayout title='Студенты' subTitle=' Управление студентами и их данными'>
       <div className='container mx-auto py-6 space-y-6'>
-        <div className='flex flex-col sm:flex-row justify-end gap-4'>
-          <CreateStudentModal />
-          <UploadStudentsModal />
-        </div>
+        {isDean && (
+          <div className='flex flex-col sm:flex-row justify-end gap-4'>
+            <CreateStudentModal />
+            <UploadStudentsModal />
+          </div>
+        )}
 
         <Card>
           <CardHeader>
@@ -362,4 +380,4 @@ export const StudentsPage = () => {
       </div>
     </PageLayout>
   );
-};
+});

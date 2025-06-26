@@ -13,7 +13,5 @@ export const ProfilePage = observer(() => {
 
   const isStudent = roles.includes(UserRole.Student);
 
-  console.log(isStudent);
-
   return isStudent ? <StudentProfilePage /> : <EmployeeProfilePage />;
 });

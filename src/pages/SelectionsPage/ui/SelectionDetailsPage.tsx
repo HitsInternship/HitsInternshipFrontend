@@ -8,6 +8,8 @@ import {
   User,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
@@ -18,34 +20,21 @@ import {
   SelectionVacancyStatus,
 } from '@/entities/Selection/models/types.ts';
 import { useMySelection } from '@/entities/Selection/hooks/useMySelection.ts';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/shared/ui';
+import { useChangeVacancyResponseStatus } from '@/entities/VacancyResponse/hooks/useChangeVRStatus.ts';
 
 const getResponseStatusLabel = (status: SelectionVacancyStatus) => {
   switch (status) {
     case SelectionVacancyStatus.Responding:
-      return 'Отвечает';
+      return 'Жду ответа';
     case SelectionVacancyStatus.Rejected:
-      return 'Отклонен';
+      return 'Отказ';
     case SelectionVacancyStatus.GotOffer:
       return 'Получил оффер';
     case SelectionVacancyStatus.Interview:
       return 'Собеседование';
     default:
       return status;
-  }
-};
-
-const getResponseStatusVariant = (status: SelectionVacancyStatus) => {
-  switch (status) {
-    case SelectionVacancyStatus.Responding:
-      return 'secondary';
-    case SelectionVacancyStatus.Rejected:
-      return 'destructive';
-    case SelectionVacancyStatus.GotOffer:
-      return 'default';
-    case SelectionVacancyStatus.Interview:
-      return 'outline';
-    default:
-      return 'secondary';
   }
 };
 
@@ -78,6 +67,16 @@ const getSelectionStatusVariant = (status: SelectionStatus) => {
 export const SelectionDetailsPage = () => {
   const navigate = useNavigate();
   const { data: selection, isLoading } = useMySelection();
+  const queryClient = useQueryClient();
+  const { mutate } = useChangeVacancyResponseStatus({
+    onSuccess: () => {
+      toast.success('Статус обновлен успешно');
+      queryClient.invalidateQueries({ queryKey: ['my-selection'] });
+    },
+    onError: () => {
+      toast.error('Произошла ошибка');
+    },
+  });
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
@@ -91,6 +90,10 @@ export const SelectionDetailsPage = () => {
     if (selection) {
       return `${selection.candidate.surname} ${selection.candidate.name} ${selection.candidate.middlename}`.trim();
     }
+  };
+
+  const onStatusChange = (status: SelectionVacancyStatus, id: string) => {
+    mutate({ params: { status: status, id: id } });
   };
 
   if (isLoading) {
@@ -254,14 +257,51 @@ export const SelectionDetailsPage = () => {
                                   </p>
                                 </div>
                               </div>
-                              <Badge
-                                variant={getResponseStatusVariant(
-                                  response.status,
-                                )}
-                                className='text-sm'
+
+                              <Select
+                                value={response.status}
+                                onValueChange={(value) => {
+                                  onStatusChange(
+                                    value as SelectionVacancyStatus,
+                                    response.id,
+                                  );
+                                }}
                               >
-                                {getResponseStatusLabel(response.status)}
-                              </Badge>
+                                <SelectTrigger>
+                                  {' '}
+                                  {getResponseStatusLabel(response.status)}
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem
+                                    value={SelectionVacancyStatus.Responding}
+                                  >
+                                    {getResponseStatusLabel(
+                                      SelectionVacancyStatus.Responding,
+                                    )}
+                                  </SelectItem>
+                                  <SelectItem
+                                    value={SelectionVacancyStatus.Interview}
+                                  >
+                                    {getResponseStatusLabel(
+                                      SelectionVacancyStatus.Interview,
+                                    )}
+                                  </SelectItem>
+                                  <SelectItem
+                                    value={SelectionVacancyStatus.GotOffer}
+                                  >
+                                    {getResponseStatusLabel(
+                                      SelectionVacancyStatus.GotOffer,
+                                    )}
+                                  </SelectItem>
+                                  <SelectItem
+                                    value={SelectionVacancyStatus.Rejected}
+                                  >
+                                    {getResponseStatusLabel(
+                                      SelectionVacancyStatus.Rejected,
+                                    )}
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
                             {index < selection.responses.length - 1 && (
                               <Separator className='my-2' />

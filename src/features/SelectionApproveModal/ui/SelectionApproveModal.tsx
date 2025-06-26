@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Building, CheckCircle, ThumbsUp, User, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 import {
   Button,
@@ -15,7 +16,6 @@ import {
 } from '@/shared/ui';
 import { Selection } from '@/entities/Selection';
 import { useApproveSelection } from '@/features/SelectionApproveModal/hooks';
-import { useStores } from '@/shared/contexts';
 
 interface SelectionApproveModalProps {
   selection: Selection;
@@ -24,16 +24,13 @@ interface SelectionApproveModalProps {
 export const SelectionApproveModal = ({
   selection,
 }: SelectionApproveModalProps) => {
-  const {
-    selectionStore: { addApprovedSelection },
-  } = useStores();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const { mutate, isPending } = useApproveSelection({
     onSuccess: () => {
       toast.success('Отбор успешно одобрен');
-      addApprovedSelection(selection.id);
+      queryClient.invalidateQueries({ queryKey: ['selections'] });
       closeModal();
     },
     onError: () => {

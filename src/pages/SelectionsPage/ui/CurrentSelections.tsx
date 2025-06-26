@@ -42,10 +42,9 @@ import {
 import { MassSelectionComment } from '@/features/MassSelectionComment/ui';
 import { SelectionChatModal } from '@/features/SelectionChatModal';
 import { useCreateSelectionComment } from '@/features/MassSelectionComment/hooks/useCreateSelectionComment.ts';
-import { SelectionApproveModal } from '@/features/SelectionApproveModal';
-import { useStores } from '@/shared/contexts';
 import { cn } from '@/shared/lib/utils.ts';
 import { SelectionModal } from '@/pages/SelectionsPage/ui/SelectionModal.tsx';
+import { SelectionApproveModal } from '@/features/SelectionApproveModal';
 
 export interface CurrentSelectionsProps {
   setHistoryMode: Dispatch<SetStateAction<boolean>>;
@@ -54,10 +53,6 @@ export interface CurrentSelectionsProps {
 export const CurrentSelections = ({
   setHistoryMode,
 }: CurrentSelectionsProps) => {
-  const {
-    selectionStore: { approvedSelections },
-  } = useStores();
-
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const [groupNumber, setGroupNumber] = useState<number | undefined>();
@@ -344,9 +339,7 @@ export const CurrentSelections = ({
                       <TableCell>
                         <Badge
                           className={cn({
-                            'text-green-600': approvedSelections.find(
-                              (id) => id === selection.id,
-                            ),
+                            'text-green-600': selection.isConfirmed,
                           })}
                           variant={getStatusBadgeVariant(
                             selection.selectionStatus,
@@ -373,11 +366,11 @@ export const CurrentSelections = ({
                         <SelectionChatModal selectionId={selection.id} />
                       </TableCell>
                       <TableCell>
-                        {selection.selectionStatus ===
-                          SelectionStatus.OfferAccepted &&
-                          !approvedSelections.some(
-                            (id) => id === selection.id,
-                          ) && <SelectionApproveModal selection={selection} />}
+                        {!selection.isConfirmed &&
+                          selection.selectionStatus ===
+                            SelectionStatus.OfferAccepted && (
+                            <SelectionApproveModal selection={selection} />
+                          )}
                       </TableCell>
                     </TableRow>
                   ))}
