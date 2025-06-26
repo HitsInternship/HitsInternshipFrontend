@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Plus, Calendar, Clock } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, startOfDay, endOfDay } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { timePeriods } from './mockAppointments';
+import { timePeriods } from './data.ts';
 
 import {
   Button,
@@ -23,56 +25,102 @@ import {
 import { Calendar as CalendarComponent } from '@/shared/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { cn } from '@/shared/lib/utils';
+import { useCalendar, useCreateTimeslot } from '@/entities/Appointment/hooks';
 
-interface CreateTimeslotModalProps {
-  onTimeslotCreate?: (date: Date, periodNumber: number) => void;
-}
-
-export const CreateTimeslotModal = ({
-  onTimeslotCreate,
-}: CreateTimeslotModalProps) => {
+export const CreateTimeslotModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedPeriod, setSelectedPeriod] = useState<string>();
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleCreate = async () => {
-    if (!selectedDate || !selectedPeriod) {
-      alert('Выберите дату и пару');
-      return;
+  const formatDateKey = (date: Date) => {
+    return format(date, 'dd.MM.yyyy');
+  };
+
+  const { data: calendarData, isLoading: isCalendarLoading } = useCalendar(
+    {
+      startDate: selectedDate
+        ? new Date(
+            startOfDay(selectedDate).getTime() + 7 * 60 * 60 * 1000,
+          ).toISOString()
+        : new Date(
+            startOfDay(new Date()).getTime() + 7 * 60 * 60 * 1000,
+          ).toISOString(),
+      endDate: selectedDate
+        ? new Date(
+            endOfDay(selectedDate).getTime() + 7 * 60 * 60 * 1000,
+          ).toISOString()
+        : new Date(
+            endOfDay(new Date()).getTime() + 7 * 60 * 60 * 1000,
+          ).toISOString(),
+    },
+    isOpen && !!selectedDate,
+  );
+
+  // Filter available periods based on calendar data
+  const getAvailablePeriods = () => {
+    if (!selectedDate) {
+      return timePeriods;
     }
 
-    setIsLoading(true);
+    if (!calendarData) {
+      return timePeriods; // Show all periods while loading
+    }
 
-    try {
-      // Здесь будет реальный API запрос
-      // const response = await fetch('/api/companies/timeslots/add', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     date: selectedDate.toISOString(),
-      //     periodNumber: parseInt(selectedPeriod)
-      //   })
-      // })
+    const dateKey = formatDateKey(selectedDate);
+    const dayData = calendarData[dateKey];
 
-      // Симуляция запроса
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (!dayData) {
+      return timePeriods; // All periods are available if no data for this date
+    }
 
-      alert('Таймслот успешно создан');
+    // Filter out periods that already have slots (either appointments or free slots)
+    return timePeriods.filter((period) => {
+      const slotData = dayData[period.number.toString()];
+      // If slotData exists (either string slotId or appointment object), don't show this period
+      return slotData === undefined || slotData === null;
+    });
+  };
 
-      if (onTimeslotCreate) {
-        onTimeslotCreate(selectedDate, Number.parseInt(selectedPeriod));
-      }
+  const availablePeriods = getAvailablePeriods();
 
+  const { mutate, isPending } = useCreateTimeslot({
+    onSuccess: () => {
+      toast.success('Слот успешно создан');
+      queryClient.invalidateQueries({ queryKey: ['calendar'] });
       setIsOpen(false);
       setSelectedDate(undefined);
       setSelectedPeriod(undefined);
-    } catch (error) {
-      alert('Ошибка при создании таймслота');
-      console.error(error);
-    } finally {
-      setIsLoading(false);
+    },
+    onError: () => {
+      toast.error('Произошла ошибка');
+    },
+  });
+
+  const handleCreate = () => {
+    if (!selectedDate || !selectedPeriod) {
+      toast('Выберите дату и пару');
+      return;
     }
+
+    const time = timePeriods.find(
+      (period) => period.number.toString() === selectedPeriod,
+    );
+
+    if (!time) {
+      return;
+    }
+
+    const [hours, minutes] = time.time.split(':').map(Number);
+    const combinedDate = new Date(selectedDate);
+    combinedDate.setHours(hours + 7, minutes, 0, 0);
+
+    mutate({
+      params: {
+        date: combinedDate.toISOString(),
+        periodNumber: Number(selectedPeriod),
+      },
+    });
   };
 
   const handleCancel = () => {
@@ -81,8 +129,24 @@ export const CreateTimeslotModal = ({
     setSelectedPeriod(undefined);
   };
 
+  // Reset selected period if it's no longer available after date change
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    // Clear selected period when date changes to avoid invalid selections
+    setSelectedPeriod(undefined);
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      // Reset state when modal closes
+      setSelectedDate(undefined);
+      setSelectedPeriod(undefined);
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className='flex items-center gap-2'>
           <Plus className='h-4 w-4' />
@@ -116,9 +180,8 @@ export const CreateTimeslotModal = ({
                 <CalendarComponent
                   mode='single'
                   selected={selectedDate}
-                  onSelect={setSelectedDate}
+                  onSelect={handleDateSelect}
                   disabled={(date) => date < new Date()}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -126,33 +189,70 @@ export const CreateTimeslotModal = ({
 
           <div className='space-y-2'>
             <Label>Пара</Label>
-            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <Select
+              value={selectedPeriod}
+              onValueChange={setSelectedPeriod}
+              disabled={!selectedDate || isCalendarLoading}
+            >
               <SelectTrigger>
-                <SelectValue placeholder='Выберите пару' />
+                <SelectValue
+                  placeholder={
+                    !selectedDate
+                      ? 'Сначала выберите дату'
+                      : isCalendarLoading
+                        ? 'Загрузка...'
+                        : availablePeriods.length === 0
+                          ? 'Нет доступных пар'
+                          : 'Выберите пару'
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                {timePeriods.map((period) => (
-                  <SelectItem
-                    key={period.number}
-                    value={period.number.toString()}
-                  >
-                    <div className='flex items-center gap-2'>
-                      <Clock className='h-4 w-4' />
-                      {period.label}
-                    </div>
-                  </SelectItem>
-                ))}
+                {availablePeriods.length === 0 &&
+                selectedDate &&
+                !isCalendarLoading ? (
+                  <div className='p-2 text-sm text-gray-500 text-center'>
+                    Все пары на эту дату уже заняты
+                  </div>
+                ) : (
+                  availablePeriods.map((period) => (
+                    <SelectItem
+                      key={period.number}
+                      value={period.number.toString()}
+                    >
+                      <div className='flex items-center gap-2'>
+                        <Clock className='h-4 w-4' />
+                        {period.label}
+                      </div>
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
+            {selectedDate &&
+              availablePeriods.length === 0 &&
+              !isCalendarLoading && (
+                <p className='text-sm text-gray-500'>
+                  На выбранную дату все временные слоты уже созданы
+                </p>
+              )}
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant='outline' onClick={handleCancel} disabled={isLoading}>
+          <Button variant='outline' onClick={handleCancel} disabled={isPending}>
             Отмена
           </Button>
-          <Button onClick={handleCreate} disabled={isLoading}>
-            {isLoading ? 'Создание...' : 'Создать'}
+          <Button
+            onClick={handleCreate}
+            disabled={
+              isPending ||
+              !selectedDate ||
+              !selectedPeriod ||
+              availablePeriods.length === 0
+            }
+          >
+            {isPending ? 'Создание...' : 'Создать'}
           </Button>
         </DialogFooter>
       </DialogContent>

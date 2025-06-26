@@ -35,6 +35,7 @@ import {
   getInternshipStatusText,
 } from '@/entities/Student/utils';
 import { ChangeStudentStatusDialog } from '@/pages/Student/ui/ChangeStudentStatusDialog';
+import { UploadStudentsModal } from '@/pages/Student/ui/UploadStudentsModal/UploadStudentsModal.tsx';
 
 export const StudentsPage = () => {
   const [selectedStreamId, setSelectedStreamId] = useState('');
@@ -101,6 +102,7 @@ export const StudentsPage = () => {
       <div className='container mx-auto py-6 space-y-6'>
         <div className='flex flex-col sm:flex-row justify-end gap-4'>
           <CreateStudentModal />
+          <UploadStudentsModal />
         </div>
 
         <Card>
