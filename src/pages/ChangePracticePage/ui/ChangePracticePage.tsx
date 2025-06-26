@@ -28,6 +28,7 @@ import { IApplicationFilters } from '@/entities/Application/models/types';
 import { useStores } from '@/shared/contexts';
 import { UserRole } from '@/entities/User/models';
 import { CreateApplicationModal } from '@/features/CreateApplicationModal/ui/CreateApplicationModal ';
+import { ApplicationTamplate } from '@/features/ApplicationTamplate';
 export const ChangePracticePage = () => {
   const {
     userStore: { roles },
@@ -57,7 +58,7 @@ export const ChangePracticePage = () => {
         setIsLoading(false);
       },
       onError: () => {
-        toast.error('Ошибка загрузки вакансий');
+        toast.error('Ошибка загрузки заявок');
         setIsLoading(false);
       },
     });
@@ -86,7 +87,7 @@ export const ChangePracticePage = () => {
         setIsLoading(false);
       },
       onError: () => {
-        toast.error('Ошибка загрузки вакансий');
+        toast.error('Ошибка загрузки заявок');
         setIsLoading(false);
       },
     });
@@ -190,6 +191,7 @@ export const ChangePracticePage = () => {
           </div>
         </CardContent>
       </Card>
+      <ApplicationTamplate />
 
       <div className='space-y-4'>
         {isLoading ? (
