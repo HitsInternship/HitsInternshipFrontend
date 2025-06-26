@@ -1,14 +1,6 @@
 import { useState, useEffect } from 'react';
-import {
-  MoreHorizontal,
-  Search,
-  Eye,
-  Crown,
-  Mail,
-  Phone,
-  LoaderCircle,
-  FilterX,
-} from 'lucide-react';
+import { Search, Mail, Phone, LoaderCircle, FilterX } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import { getFullName } from './StudentPage.utils';
 import { CreateStudentModal } from '../CreateStudentModal';
@@ -23,15 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu';
 import { Badge } from '@/shared/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import type { IStudent } from '@/entities/Student';
+import { EInternshipStatus, IStudent } from '@/entities/Student';
 import {
   Select,
   SelectContent,
@@ -43,12 +29,12 @@ import { Label, PageLayout } from '@/shared/ui';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { useStreams } from '@/features/StreamsCRUD/hooks';
 import { useGroups } from '@/entities/Groups';
+import { useStudentsByGroup, useStudentsByStream } from '@/entities/Student';
 import {
-  getStatusColor,
-  getStatusText,
-  useStudentsByGroup,
-  useStudentsByStream,
-} from '@/entities/Student';
+  getInternshipStatusColor,
+  getInternshipStatusText,
+} from '@/entities/Student/utils';
+import { ChangeStudentStatusDialog } from '@/pages/Student/ui/ChangeStudentStatusDialog';
 
 export const StudentsPage = () => {
   const [selectedStreamId, setSelectedStreamId] = useState('');
@@ -57,6 +43,7 @@ export const StudentsPage = () => {
   const [activeFilter, setActiveFilter] = useState<'stream' | 'group'>(
     'stream',
   );
+  const navigate = useNavigate();
 
   const { data: streams, isLoading: isLoadingStreams } = useStreams();
   const { data: allGroups, isLoading: isLoadingAllGroups } = useGroups();
@@ -99,11 +86,6 @@ export const StudentsPage = () => {
     setSelectedStreamId('');
     setSelectedGroupId('');
     setSearchTerm('');
-  };
-
-  const handleViewStudent = (studentId: string) => {
-    console.log('Просмотр студента:', studentId);
-    // Здесь будет логика просмотра студента
   };
 
   const isLoading =
@@ -304,8 +286,7 @@ export const StudentsPage = () => {
                     {activeFilter === 'stream' && <TableHead>Группа</TableHead>}
                     <TableHead>Курс</TableHead>
                     <TableHead>Статус</TableHead>
-                    <TableHead>Роль</TableHead>
-                    <TableHead className='w-[50px]' />
+                    <TableHead>Прогресс</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -337,46 +318,29 @@ export const StudentsPage = () => {
                       )}
                       <TableCell>{student.course || 'Не указан'}</TableCell>
                       <TableCell>
-                        <Badge className={getStatusColor(student.status)}>
-                          {getStatusText(student.status)}
+                        <ChangeStudentStatusDialog
+                          status={student.status}
+                          studentId={student.id}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          onClick={() => {
+                            switch (student.internshipStatus) {
+                              case EInternshipStatus.InSearch:
+                                navigate('/selections');
+                                break;
+                              case EInternshipStatus.GotInternship:
+                                navigate('/practices');
+                                break;
+                            }
+                          }}
+                          className={getInternshipStatusColor(
+                            student.internshipStatus,
+                          )}
+                        >
+                          {getInternshipStatusText(student.internshipStatus)}
                         </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {student.isHeadMan ? (
-                          <Badge
-                            variant='outline'
-                            className='bg-amber-50 text-amber-700 border-amber-200'
-                          >
-                            <Crown className='mr-1 h-3 w-3' />
-                            Староста
-                          </Badge>
-                        ) : (
-                          <Badge
-                            variant='outline'
-                            className='bg-gray-50 text-gray-700 border-gray-200'
-                          >
-                            Студент
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant='ghost' className='h-8 w-8 p-0'>
-                              <span className='sr-only'>Открыть меню</span>
-                              <MoreHorizontal className='h-4 w-4' />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align='end'>
-                            <DropdownMenuItem
-                              onClick={() => handleViewStudent(student.id)}
-                            >
-                              <Eye className='mr-2 h-4 w-4' />
-                              Просмотр
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                          {/* <EditStudentModal studentId={student.id} />*/}
-                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))}

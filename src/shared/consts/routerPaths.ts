@@ -13,4 +13,5 @@ export const ROUTER_PATHS = {
   PRACTICES: '/practices',
   STATS: '/statistics',
   PRACTICE: (id: string) => `/practices/${id}`,
+  APPOINTMENTS: '/appointments',
 };

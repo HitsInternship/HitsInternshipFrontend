@@ -15,6 +15,7 @@ import { ChangePracticePage } from '@/pages/ChangePracticePage';
 import { SelectionsPage } from '@/pages/SelectionsPage';
 import { GlobalPracticesPage } from '@/pages/GlobalPracticesPage';
 import { PracticePage } from '@/pages/PracticePage';
+import { AppointmentsPage } from '@/pages/AppointmentsPage/ui/AppointmentsPage.tsx';
 import { StatisticsPage } from '@/pages/StatisticsPage/StatisticsPage';
 
 export const Page: FC = observer(() => {
@@ -47,6 +48,10 @@ export const Page: FC = observer(() => {
           element={<GlobalPracticesPage />}
         />
         <Route path={ROUTER_PATHS.PRACTICE(':id')} element={<PracticePage />} />
+        <Route
+          path={ROUTER_PATHS.APPOINTMENTS}
+          element={<AppointmentsPage />}
+        />
       </Route>
     </Routes>
   );

@@ -5,16 +5,18 @@ import { UserRole } from '../../models';
 
 export class UserStore {
   name?: string;
-  roles: UserRole[] = [];
-  isAuthorized: boolean = false;
-  isHydrated: boolean = false;
 
+  roles: UserRole[] = [];
+
+  isAuthorized = false;
   constructor() {
     makeAutoObservable(this);
 
     makePersistable(this, {
       name: 'UserStore',
+
       properties: ['name', 'roles', 'isAuthorized'],
+
       storage: window.localStorage,
     });
   }

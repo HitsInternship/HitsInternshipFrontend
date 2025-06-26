@@ -3,3 +3,4 @@ export { getStudentsByGroup } from './getStudentsByGroup';
 export { getStudentsByStream } from './getStudentsByStream';
 export { createStudent } from './createStudent';
 export { editStudentInfo } from './editStudentInfo';
+export { editStudentStatus } from './editStudentStatus';

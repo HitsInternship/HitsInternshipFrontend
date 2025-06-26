@@ -1,4 +1,4 @@
-import { EStudentStatus } from '../models';
+import { EInternshipStatus, EStudentStatus } from '../models';
 
 export const getStatusColor = (status: EStudentStatus) => {
   switch (status) {
@@ -22,7 +22,7 @@ export const getStatusText = (status: EStudentStatus) => {
     case EStudentStatus.InProcess:
       return 'Обучается';
     case EStudentStatus.OnAcademicLeave:
-      return 'Академический отпуск';
+      return 'Академ. отпуск';
     case EStudentStatus.Graduated:
       return 'Выпускник';
     case EStudentStatus.Expelled:
@@ -31,5 +31,31 @@ export const getStatusText = (status: EStudentStatus) => {
       return 'Переведен';
     default:
       return status;
+  }
+};
+
+export const getInternshipStatusText = (status: EInternshipStatus) => {
+  switch (status) {
+    case EInternshipStatus.UnderSecondGrade:
+      return 'Еще рано';
+    case EInternshipStatus.InSearch:
+      return 'В поиске';
+    case EInternshipStatus.GotInternship:
+      return 'На практике';
+    default:
+      return status;
+  }
+};
+
+export const getInternshipStatusColor = (status: EInternshipStatus) => {
+  switch (status) {
+    case EInternshipStatus.UnderSecondGrade:
+      return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+    case EInternshipStatus.InSearch:
+      return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200';
+    case EInternshipStatus.GotInternship:
+      return 'bg-green-100 text-green-800 hover:bg-green-200';
+    default:
+      return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
   }
 };

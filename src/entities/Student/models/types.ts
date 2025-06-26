@@ -11,7 +11,7 @@ export enum EStudentStatus {
 export enum EInternshipStatus {
   UnderSecondGrade = 'Small',
   InSearch = 'Candidate',
-  GotInternship = 'Internship',
+  GotInternship = 'Intern',
 }
 
 export interface IStudent {

@@ -8,12 +8,16 @@ import { ROUTER_PATHS } from '@/shared/consts';
 
 export const useLogout = () => {
   const navigate = useNavigate();
+
   return useMutation({
     mutationFn: logout,
+
     onSuccess: () => {
       navigate(ROUTER_PATHS.LOGIN);
+
       toast.success('Выход из аккаунта выполнен');
     },
+
     onError: () => {
       toast.error('Произошла ошибка');
     },

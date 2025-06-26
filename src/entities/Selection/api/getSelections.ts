@@ -6,6 +6,7 @@ export interface GetSelectionsParams {
   groupNumber?: number;
   status?: SelectionStatus;
   isArchive?: boolean;
+  semester?: string;
 }
 
 export type GetSelectionsConfig = RequestConfig<GetSelectionsParams>;
@@ -17,12 +18,12 @@ export const getSelections = ({ params, config }: GetSelectionsConfig) => {
   if (params.status) {
     queryParams.append('status', params.status);
   }
-  if (params.isArchive) {
-    queryParams.append('isArchive', params.isArchive.toString());
+  if (params.semester) {
+    queryParams.append('semesterId', params.semester.toString());
   }
 
-  return api.get<Selection[]>(
-    `/api/selections?${queryParams.toString()}`,
-    config,
-  );
+  const queryString = queryParams.toString();
+  const url = `/api/selections${queryString ? `?${queryString}` : ''}`;
+
+  return api.get<Selection[]>(url, config);
 };
