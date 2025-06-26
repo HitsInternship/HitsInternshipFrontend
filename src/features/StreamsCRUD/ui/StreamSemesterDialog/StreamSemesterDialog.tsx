@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { StreamSemesterDialogProps } from './StreamSemesterDialog.types';
 
@@ -18,7 +18,10 @@ import {
   SelectValue,
 } from '@/shared/ui/select';
 import { Button, Input, Label } from '@/shared/ui';
-import { useCreateStreamSemester } from '@/features/StreamsCRUD/hooks';
+import {
+  useCreateStreamSemester,
+  useUpdateStreamSemester,
+} from '@/features/StreamsCRUD/hooks';
 
 export const StreamSemesterDialog = ({
   isLinkDialogOpen,
@@ -26,26 +29,46 @@ export const StreamSemesterDialog = ({
   currentLinkId,
   semesters,
   linkStreamId,
+  currentSemesterId,
+  currentLinkNumber,
 }: StreamSemesterDialogProps) => {
   const { mutateAsync: createStreamSemesterMutation } =
     useCreateStreamSemester();
+  const { mutateAsync: updateStreamSemesterMutation } =
+    useUpdateStreamSemester();
 
-  const [linkSemesterId, setLinkSemesterId] = useState('');
-  const [linkNumber, setLinkNumber] = useState(0);
+  const [linkSemesterId, setLinkSemesterId] = useState<string | null>('');
+  const [linkNumber, setLinkNumber] = useState<number | null>(1);
 
   const handleSaveLink = () => {
-    if (!linkSemesterId) {
+    if (!linkSemesterId || !linkNumber) {
       return;
     }
 
-    createStreamSemesterMutation({
-      streamId: linkStreamId,
-      semesterId: linkSemesterId,
-      number: linkNumber,
-    });
+    if (currentLinkId) {
+      updateStreamSemesterMutation({
+        id: currentLinkId,
+        payload: {
+          streamId: linkStreamId,
+          semesterId: linkSemesterId,
+          number: linkNumber,
+        },
+      });
+    } else {
+      createStreamSemesterMutation({
+        streamId: linkStreamId,
+        semesterId: linkSemesterId,
+        number: linkNumber,
+      });
+    }
 
     setIsLinkDialogOpen(false);
   };
+
+  useEffect(() => {
+    setLinkSemesterId(currentSemesterId);
+    setLinkNumber(currentLinkNumber);
+  }, [currentSemesterId, currentLinkNumber]);
 
   return (
     <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
@@ -63,7 +86,10 @@ export const StreamSemesterDialog = ({
         <div className='grid gap-4 py-4'>
           <div className='grid grid-cols-4 items-center gap-4'>
             <Label htmlFor='semesterId'>Семестр</Label>
-            <Select value={linkSemesterId} onValueChange={setLinkSemesterId}>
+            <Select
+              value={linkSemesterId || ''}
+              onValueChange={setLinkSemesterId}
+            >
               <SelectTrigger className='col-span-3'>
                 <SelectValue placeholder='Выберите семестр' />
               </SelectTrigger>
@@ -83,9 +109,10 @@ export const StreamSemesterDialog = ({
             <Input
               id='number'
               type='number'
-              value={linkNumber}
+              value={linkNumber || 1}
+              min={1}
               onChange={(e) =>
-                setLinkNumber(Number.parseInt(e.target.value) || 0)
+                setLinkNumber(Number.parseInt(e.target.value) || 1)
               }
               className='col-span-3'
             />
