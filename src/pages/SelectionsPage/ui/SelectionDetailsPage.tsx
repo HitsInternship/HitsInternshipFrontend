@@ -330,64 +330,6 @@ export const SelectionDetailsPage = () => {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Быстрые действия */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className='text-lg'>Действия</CardTitle>
-                </CardHeader>
-                <CardContent className='space-y-3'>
-                  <Button
-                    variant='outline'
-                    className='w-full justify-start'
-                    asChild
-                  >
-                    <a href={`mailto:${selection.candidate.email}`}>
-                      <Mail className='h-4 w-4 mr-2' />
-                      Написать студенту
-                    </a>
-                  </Button>
-                  <Button
-                    variant='outline'
-                    className='w-full justify-start'
-                    asChild
-                  >
-                    <a href={`tel:${selection.candidate.phone}`}>
-                      <Phone className='h-4 w-4 mr-2' />
-                      Позвонить студенту
-                    </a>
-                  </Button>
-                  <Separator />
-                  <Button
-                    variant='ghost'
-                    className='w-full justify-start text-gray-600'
-                  >
-                    <User className='h-4 w-4 mr-2' />
-                    Профиль студента
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Дополнительная информация */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className='text-lg'>Дополнительно</CardTitle>
-                </CardHeader>
-                <CardContent className='space-y-3 text-sm text-gray-600'>
-                  <div>
-                    <p className='font-medium'>ID отбора</p>
-                    <p className='font-mono text-xs bg-gray-100 p-1 rounded'>
-                      {selection.id}
-                    </p>
-                  </div>
-                  <div>
-                    <p className='font-medium'>ID студента</p>
-                    <p className='font-mono text-xs bg-gray-100 p-1 rounded'>
-                      {selection.candidate.id}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>

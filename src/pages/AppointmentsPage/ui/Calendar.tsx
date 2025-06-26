@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import {
@@ -14,15 +16,13 @@ import {
   subWeeks,
   subMonths,
   subDays,
+  startOfDay,
+  endOfDay,
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { observer } from 'mobx-react-lite';
 
-import {
-  mockAppointmentDetails,
-  mockTimeSlots,
-  timePeriods,
-} from './mockAppointments';
+import { timePeriods } from './data.ts';
 import { CreateTimeslotModal } from './CreateTimeslotModal';
 
 import {
@@ -39,6 +39,7 @@ import {
 import { BookAppointmentModal } from '@/pages/AppointmentsPage/ui/BookAppointmentModal.tsx';
 import { UserRole } from '@/entities/User/models';
 import { useStores } from '@/shared/contexts';
+import { useCalendar } from '@/entities/Appointment/hooks';
 
 type ViewMode = 'day' | 'week' | 'month';
 
@@ -47,12 +48,14 @@ export const AppointmentsCalendar = observer(() => {
   const [viewMode, setViewMode] = useState<ViewMode>('week');
   const [bookingModal, setBookingModal] = useState<{
     isOpen: boolean;
-    date: string;
+    slotId: string;
     periodNumber: number;
+    date: string;
   }>({
     isOpen: false,
-    date: '',
+    slotId: '',
     periodNumber: 0,
+    date: '',
   });
 
   const {
@@ -71,22 +74,72 @@ export const AppointmentsCalendar = observer(() => {
     return format(date, 'dd.MM.yyyy');
   };
 
+  const parseTimeToMinutes = (timeString: string) => {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
+  const isPastSlot = (date: Date, timeString: string) => {
+    const now = new Date();
+    const slotDate = new Date(date);
+    const slotMinutes = parseTimeToMinutes(timeString);
+
+    // Set the slot time
+    slotDate.setHours(Math.floor(slotMinutes / 60), slotMinutes % 60, 0, 0);
+
+    return slotDate < now;
+  };
+
+  const isCurrentSlot = (date: Date, timeString: string) => {
+    const now = new Date();
+    const slotDate = new Date(date);
+    const slotMinutes = parseTimeToMinutes(timeString);
+
+    // Set the slot time (assuming each slot is 1 hour 50 minutes long)
+    const slotStart = new Date(slotDate);
+    slotStart.setHours(Math.floor(slotMinutes / 60), slotMinutes % 60, 0, 0);
+
+    const slotEnd = new Date(slotStart);
+    slotEnd.setMinutes(slotEnd.getMinutes() + 110); // 1 hour 50 minutes
+
+    return now >= slotStart && now <= slotEnd;
+  };
+
+  // Функция для получения начала дня в UTC+7
+  const getStartOfDayUTC7 = (date: Date) => {
+    const startDay = startOfDay(date);
+    // Конвертируем в UTC+7: добавляем 7 часов к UTC времени
+    return new Date(startDay.getTime() + 7 * 60 * 60 * 1000);
+  };
+
+  // Функция для получения конца дня в UTC+7 (23:59:59.999)
+  const getEndOfDayUTC7 = (date: Date) => {
+    const endDay = endOfDay(date);
+    // Конвертируем в UTC+7: добавляем 7 часов к UTC времени
+    return new Date(endDay.getTime() + 7 * 60 * 60 * 1000);
+  };
+
   const getDateRange = () => {
+    const addUTC7Hours = (date: Date) =>
+      new Date(date.getTime() + 7 * 60 * 60 * 1000);
+
     switch (viewMode) {
       case 'day':
-        return [currentDate];
+        return [addUTC7Hours(currentDate)];
       case 'week':
         return eachDayOfInterval({
-          start: startOfWeek(currentDate, { weekStartsOn: 1 }),
-          end: endOfWeek(currentDate, { weekStartsOn: 1 }),
+          start: addUTC7Hours(startOfWeek(currentDate, { weekStartsOn: 1 })),
+          end: addUTC7Hours(
+            subDays(endOfWeek(currentDate, { weekStartsOn: 1 }), 1),
+          ), // Убираем воскресенье
         });
       case 'month':
         return eachDayOfInterval({
-          start: startOfMonth(currentDate),
-          end: endOfMonth(currentDate),
+          start: addUTC7Hours(startOfMonth(currentDate)),
+          end: addUTC7Hours(endOfMonth(currentDate)),
         });
       default:
-        return [currentDate];
+        return [addUTC7Hours(currentDate)];
     }
   };
 
@@ -124,8 +177,10 @@ export const AppointmentsCalendar = observer(() => {
         return `${format(
           startOfWeek(currentDate, { weekStartsOn: 1 }),
           'd MMM',
-          { locale: ru },
-        )} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd MMM yyyy', { locale: ru })}`;
+          {
+            locale: ru,
+          },
+        )} - ${format(subDays(endOfWeek(currentDate, { weekStartsOn: 1 }), 1), 'd MMM yyyy', { locale: ru })}`;
       case 'month':
         return format(currentDate, 'LLLL yyyy', { locale: ru });
       default:
@@ -134,84 +189,149 @@ export const AppointmentsCalendar = observer(() => {
   };
 
   const dateRange = getDateRange();
+  const startDate = getStartOfDayUTC7(dateRange[0]).toISOString();
+  const endDate = getEndOfDayUTC7(
+    dateRange[dateRange.length - 1],
+  ).toISOString();
+
+  const {
+    data: calendarData,
+    isLoading,
+    error,
+  } = useCalendar({
+    startDate,
+    endDate,
+  });
 
   const handleSlotClick = (date: Date, periodNumber: number) => {
     const dateKey = formatDateKey(date);
-    const slots = (mockTimeSlots as Record<string, Record<string, string>>)[
-      dateKey
-    ];
-    const isSlotTaken = slots?.[periodNumber.toString()];
+    const dayData = calendarData?.[dateKey];
+    const slotData = dayData?.[periodNumber.toString()];
 
-    if (isCurator && !isSlotTaken) {
+    const period = timePeriods.find((p) => p.number === periodNumber);
+    if (!period) return;
+
+    const isPastSlotValue = isPastSlot(date, period.time);
+
+    // If slot is free (string slotId) and user is curator and slot is not in the past, allow booking
+    if (isCurator && typeof slotData === 'string' && !isPastSlotValue) {
       setBookingModal({
         isOpen: true,
+        slotId: slotData, // Use the actual slotId from API
+        periodNumber: periodNumber,
         date: dateKey,
-        periodNumber,
       });
     }
   };
 
   const renderTimeSlot = (date: Date, period: (typeof timePeriods)[0]) => {
     const dateKey = formatDateKey(date);
-    const timeSlotsForDate =
-      mockTimeSlots[dateKey as keyof typeof mockTimeSlots];
-    const appointmentId =
-      timeSlotsForDate?.[
-        period.number.toString() as keyof typeof timeSlotsForDate
-      ];
-    const appointmentDetails = appointmentId
-      ? mockAppointmentDetails[
-          appointmentId as keyof typeof mockAppointmentDetails
-        ]
-      : null;
+    const dayData = calendarData?.[dateKey];
+    const slotData = dayData?.[period.number.toString()];
 
-    const isSlotTaken = !!appointmentId;
-    const isPastDate = date < new Date();
+    // Determine slot type
+    const isAppointment = typeof slotData === 'object';
+    const isFreeSlot = typeof slotData === 'string';
+    const appointmentDetails = isAppointment ? slotData : null;
+    const hasSlot = !!slotData;
+
+    const isPastSlotValue = isPastSlot(date, period.time);
+    const isCurrentSlotValue = isCurrentSlot(date, period.time);
 
     return (
       <div
         key={`${dateKey}-${period.number}`}
         className={`
-          p-3 border rounded-lg min-h-[100px] transition-colors cursor-pointer
-          ${
-            isSlotTaken
-              ? 'bg-blue-50 border-blue-200 hover:bg-blue-100'
-              : isPastDate
-                ? 'bg-gray-50 border-gray-200 cursor-not-allowed'
-                : 'bg-white border-gray-200 hover:bg-gray-50'
-          }
-          ${isCurator && !isSlotTaken && !isPastDate ? 'hover:border-blue-300' : ''}
-        `}
-        onClick={() => !isPastDate && handleSlotClick(date, period.number)}
+    p-3 border rounded-lg min-h-[100px] transition-colors cursor-pointer relative
+    ${
+      isCurrentSlotValue
+        ? 'bg-yellow-100 border-yellow-400 ring-2 ring-yellow-300' // Current slot highlighting
+        : isAppointment
+          ? isPastSlotValue
+            ? 'bg-blue-100 border-blue-300 opacity-60' // Past appointment
+            : 'bg-blue-50 border-blue-200 hover:bg-blue-100'
+          : isFreeSlot
+            ? isPastSlotValue
+              ? 'bg-gray-100 border-gray-300 opacity-60 cursor-not-allowed' // Past free slot
+              : 'bg-green-50 border-green-200 hover:bg-green-100'
+            : 'bg-gray-50 border-gray-300' // Empty slot styling
+    }
+    ${isCurator && isFreeSlot && !isPastSlotValue ? 'hover:border-green-300' : ''}
+    ${isPastSlotValue && !isCurrentSlotValue ? 'striped-background' : ''} // Add striped class for past slots
+  `}
+        onClick={() =>
+          !isPastSlotValue && hasSlot && handleSlotClick(date, period.number)
+        }
       >
-        <div className='flex items-center justify-between mb-2'>
-          <span className='text-sm font-medium text-gray-700'>
+        {/* Striped overlay for past slots */}
+        {isPastSlotValue && !isCurrentSlotValue && (
+          <div
+            className='absolute inset-0 opacity-30 pointer-events-none'
+            style={{
+              backgroundImage:
+                'repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.1) 5px, rgba(0,0,0,0.1) 10px)',
+            }}
+          />
+        )}
+
+        <div className='flex items-center justify-between mb-2 relative z-10'>
+          <span
+            className={`text-sm font-medium ${isCurrentSlotValue ? 'text-yellow-800' : 'text-gray-700'}`}
+          >
             {period.time}
           </span>
-          {isSlotTaken && (
+          {isCurrentSlotValue && (
+            <Badge
+              variant='default'
+              className='text-xs bg-yellow-500 text-white'
+            >
+              Сейчас
+            </Badge>
+          )}
+          {isAppointment && !isCurrentSlotValue && (
             <Badge variant='secondary' className='text-xs'>
-              Занято
+              {isPastSlotValue ? 'Прошло' : 'Занято'}
+            </Badge>
+          )}
+          {isFreeSlot && !isCurrentSlotValue && (
+            <Badge
+              variant='outline'
+              className={`text-xs ${isPastSlotValue ? 'text-gray-400' : 'text-green-600'}`}
+            >
+              {isPastSlotValue ? 'Прошло' : 'Свободно'}
+            </Badge>
+          )}
+          {!hasSlot && (
+            <Badge variant='outline' className='text-xs text-gray-400'>
+              Нет слота
             </Badge>
           )}
         </div>
 
         {appointmentDetails && (
-          <div className='space-y-1'>
-            <p className='text-sm font-semibold text-blue-900 truncate'>
-              {appointmentDetails.company}
+          <div className='space-y-1 relative z-10'>
+            <p
+              className={`text-sm font-semibold truncate ${isCurrentSlotValue ? 'text-yellow-900' : 'text-blue-900'}`}
+            >
+              {appointmentDetails.companyName}
             </p>
-            <p className='text-xs text-gray-600 line-clamp-3'>
+            <p
+              className={`text-xs line-clamp-3 ${isCurrentSlotValue ? 'text-yellow-700' : 'text-gray-600'}`}
+            >
               {appointmentDetails.description}
-            </p>
-            <p className='text-xs text-gray-500 mt-1'>
-              {appointmentDetails.curator}
             </p>
           </div>
         )}
 
-        {!isSlotTaken && !isPastDate && isCurator && (
-          <div className='flex items-center justify-center h-full text-gray-400'>
+        {isFreeSlot && !isPastSlotValue && isCurator && (
+          <div className='flex items-center justify-center h-full text-gray-400 relative z-10'>
             <Plus className='h-5 w-5' />
+          </div>
+        )}
+
+        {!hasSlot && (
+          <div className='flex items-center justify-center h-full text-gray-300 relative z-10'>
+            <span className='text-xs'>Слот не создан</span>
           </div>
         )}
       </div>
@@ -238,6 +358,7 @@ export const AppointmentsCalendar = observer(() => {
             <SelectContent>
               <SelectItem value='day'>День</SelectItem>
               <SelectItem value='week'>Неделя</SelectItem>
+              <SelectItem value='month'>Месяц</SelectItem>
             </SelectContent>
           </Select>
 
@@ -273,53 +394,83 @@ export const AppointmentsCalendar = observer(() => {
       </div>
 
       {/* Календарь */}
-      <Card className='w-full'>
-        <CardContent className='p-6'>
-          <div
-            className={`grid gap-4 w-full ${
-              viewMode === 'day'
-                ? 'grid-cols-1 max-w-md mx-auto'
-                : viewMode === 'week'
-                  ? 'grid-cols-7'
-                  : 'grid-cols-7'
-            }`}
-          >
-            {dateRange.map((date) => (
-              <div key={date.toISOString()} className='space-y-3 min-w-0'>
-                <div className='text-center p-3 border-b bg-gray-50 rounded-t-lg'>
-                  <div className='text-sm font-medium text-gray-600'>
-                    {format(date, 'EEE', { locale: ru })}
-                  </div>
-                  <div
-                    className={`text-xl font-bold ${isSameDay(date, new Date()) ? 'text-blue-600' : 'text-gray-900'}`}
-                  >
-                    {format(date, 'd')}
-                  </div>
-                  {viewMode !== 'day' && (
-                    <div className='text-xs text-gray-500'>
-                      {format(date, 'MMM', { locale: ru })}
-                    </div>
-                  )}
-                </div>
+      {isLoading && (
+        <div className='flex justify-center items-center h-[90vh] w-[100vw]'>
+          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-600' />
+          <span className='ml-3 text-muted-foreground'>
+            Загрузка календаря...
+          </span>
+        </div>
+      )}
 
-                <div className='space-y-3 px-1'>
-                  {timePeriods.map((period) => renderTimeSlot(date, period))}
+      {error && (
+        <div className='flex justify-center items-center h-64'>
+          <div className='text-lg text-red-600'>Ошибка загрузки календаря</div>
+        </div>
+      )}
+
+      {!isLoading && !error && (
+        <Card className='w-full'>
+          <CardContent className='p-6'>
+            <div
+              className={`grid gap-4 w-full ${
+                viewMode === 'day'
+                  ? 'grid-cols-1 max-w-md mx-auto'
+                  : viewMode === 'week'
+                    ? 'grid-cols-7'
+                    : 'grid-cols-7'
+              }`}
+            >
+              {dateRange.map((date) => (
+                <div key={date.toISOString()} className='space-y-3 min-w-0'>
+                  <div className='text-center p-3 border-b bg-gray-50 rounded-t-lg'>
+                    <div className='text-sm font-medium text-gray-600'>
+                      {format(date, 'EEE', { locale: ru })
+                        .replace('пн.', 'пн')
+                        .replace('вт.', 'вт')
+                        .replace('ср.', 'ср')
+                        .replace('чт.', 'чт')
+                        .replace('пт.', 'пт')
+                        .replace('сб.', 'сб')
+                        .replace('вс.', 'вс')}
+                    </div>
+                    <div
+                      className={`text-xl font-bold ${isSameDay(date, new Date()) ? 'text-blue-600' : 'text-gray-900'}`}
+                    >
+                      {format(date, 'd')}
+                    </div>
+                    {viewMode !== 'day' && (
+                      <div className='text-xs text-gray-500'>
+                        {format(date, 'MMM', { locale: ru })}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className='space-y-3 px-1'>
+                    {timePeriods.map((period) => renderTimeSlot(date, period))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Модальное окно бронирования */}
       {isCurator && (
         <BookAppointmentModal
           isOpen={bookingModal.isOpen}
           onClose={() =>
-            setBookingModal({ isOpen: false, date: '', periodNumber: 0 })
+            setBookingModal({
+              isOpen: false,
+              slotId: '',
+              periodNumber: 0,
+              date: '',
+            })
           }
-          date={bookingModal.date}
+          timeslotId={bookingModal.slotId}
           periodNumber={bookingModal.periodNumber}
+          date={bookingModal.date}
         />
       )}
     </div>

@@ -21,6 +21,7 @@ import {
   useCreateSemester,
   useUpdateSemester,
 } from '@/features/SemesterCRUD/hooks';
+import { getLocalDate } from '@/shared/utils/getLocalDate';
 
 export const CreateSemesterDialog = ({
   isDialogOpen,
@@ -45,16 +46,16 @@ export const CreateSemesterDialog = ({
         semesterId: currentSemester.id,
         payload: {
           startDate:
-            typeof startDate === 'string' ? startDate : startDate.toISOString(),
+            typeof startDate === 'string' ? startDate : getLocalDate(startDate),
           endDate:
-            typeof endDate === 'string' ? endDate : endDate.toISOString(),
+            typeof endDate === 'string' ? endDate : getLocalDate(endDate),
           description,
         },
       });
     } else {
       await createSemesterMutation({
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
+        startDate: getLocalDate(startDate),
+        endDate: getLocalDate(endDate),
         description,
       });
     }

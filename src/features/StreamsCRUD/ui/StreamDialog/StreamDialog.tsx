@@ -38,6 +38,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { cn } from '@/shared/lib/utils';
 import { Calendar } from '@/shared/ui/calendar';
+import { getLocalDate } from '@/shared/utils/getLocalDate';
 
 export const StreamDialog = ({
   isStreamDialogOpen,
@@ -51,7 +52,7 @@ export const StreamDialog = ({
 
   const [streamNumber, setStreamNumber] = useState('');
   const [year, setYear] = useState(new Date().getFullYear().toString());
-  const [status, setStatus] = useState<Status>('Selection');
+  const [status, setStatus] = useState<Status>('None');
   const [course, setCourse] = useState('');
 
   const [semester, setSemester] = useState('');
@@ -77,7 +78,7 @@ export const StreamDialog = ({
         addSelection({
           semesterId: semester,
           streamId: currentStream.id,
-          deadline: selectionDate!.toISOString().split('T')[0],
+          deadline: getLocalDate(selectionDate!),
         });
       }
 
@@ -113,7 +114,9 @@ export const StreamDialog = ({
     }
   }, [currentStream]);
 
-  const canChangeStatus = currentStream && currentStream.status !== 'Practice';
+  const canChangeStatus = currentStream
+    ? currentStream.status !== 'Practice'
+    : true;
 
   return (
     <>
