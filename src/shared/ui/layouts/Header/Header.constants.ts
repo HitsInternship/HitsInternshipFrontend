@@ -21,7 +21,7 @@ export const HeaderItems: IHeaderItem[] = [
   {
     name: 'Группы',
     link: ROUTER_PATHS.SEMESTER_STREAM_GROUP,
-    roles: [UserRole.Curator, UserRole.DeanMember],
+    roles: [UserRole.DeanMember],
   },
   {
     name: 'Студенты',
@@ -36,7 +36,7 @@ export const HeaderItems: IHeaderItem[] = [
   {
     name: 'Компании',
     link: ROUTER_PATHS.COMPANIES,
-    roles: [UserRole.Curator, UserRole.DeanMember, UserRole.Student],
+    roles: [ UserRole.DeanMember, UserRole.Student],
   },
   {
     name: 'Отборы',
@@ -46,7 +46,7 @@ export const HeaderItems: IHeaderItem[] = [
   {
     name: 'Практики',
     link: ROUTER_PATHS.PRACTICES,
-    roles: [ UserRole.Curator, UserRole.DeanMember, UserRole.Student],
+    roles: [UserRole.DeanMember, UserRole.Student],
   },
   {
     name: 'Встречи',

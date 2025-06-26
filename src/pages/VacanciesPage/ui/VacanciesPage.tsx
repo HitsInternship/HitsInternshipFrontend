@@ -48,6 +48,7 @@ export const VacanciesPage = (): ReactElement => {
 
   const canControl =
     roles.includes(UserRole.Curator) || roles.includes(UserRole.DeanMember);
+  const isCurator = roles.includes(UserRole.Curator);
 
   const [filters, setFilters] = useState<VacancyFilters>({
     positionId: 'all',
@@ -166,30 +167,30 @@ export const VacanciesPage = (): ReactElement => {
                   </SelectContent>
                 </Select>
               </div>
-
               {/* Фильтр по компании */}
-              <div className='space-y-2'>
-                <Label htmlFor='company-filter'>Компания</Label>
-                <Select
-                  value={filters.companyId}
-                  onValueChange={(value) =>
-                    handleFilterChange('companyId', value)
-                  }
-                >
-                  <SelectTrigger id='company-filter'>
-                    <SelectValue placeholder='Все компании' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='all'>Все компании</SelectItem>
-                    {companies?.map((company) => (
-                      <SelectItem key={company.id} value={company.id}>
-                        {company.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
+              {!isCurator && (
+                <div className='space-y-2'>
+                  <Label htmlFor='company-filter'>Компания</Label>
+                  <Select
+                    value={filters.companyId}
+                    onValueChange={(value) =>
+                      handleFilterChange('companyId', value)
+                    }
+                  >
+                    <SelectTrigger id='company-filter'>
+                      <SelectValue placeholder='Все компании' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='all'>Все компании</SelectItem>
+                      {companies?.map((company) => (
+                        <SelectItem key={company.id} value={company.id}>
+                          {company.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               {/* Чекбокс для закрытых вакансий */}
               <div className='space-y-2'>
                 <Label>Статус вакансий</Label>
