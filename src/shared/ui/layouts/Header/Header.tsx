@@ -60,8 +60,10 @@ export const Header = observer(() => {
           <div className='w-full flex-1 md:w-auto md:flex-none'>
             {/* Здесь можно добавить поиск или другие элементы */}
           </div>
-          <nav className='flex items-center gap-6'>
-          <User2 className='h-6 w-6' onClick={()=>navigate(ROUTER_PATHS.PROFILE)}/>
+          <nav className='flex items-center gap-6 '>
+        <span  className='p-1 cursor-pointer hover:bg-gray-100 rounded-md' onClick={() => navigate(ROUTER_PATHS.PROFILE)}>
+              <User2 className='h-6 w-6'  />
+       </span>
             <Button variant='outline' className='mr-2' onClick={handleLogoutClick}>
               Выйти
             </Button>
