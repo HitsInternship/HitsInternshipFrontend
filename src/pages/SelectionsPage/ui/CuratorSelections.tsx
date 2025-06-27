@@ -38,14 +38,9 @@ import {
   Input,
 } from '@/shared/ui';
 import { SelectionApproveModal } from '@/features/SelectionApproveModal';
-import { useStores } from '@/shared/contexts';
 import { cn } from '@/shared/lib/utils.ts';
 
 export const CuratorSelections = observer(() => {
-  const {
-    selectionStore: { approvedSelections },
-  } = useStores();
-
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [status, setStatus] = useState<SelectionStatus | undefined>();
   const [company, setCompany] = useState<string | undefined>();
@@ -263,9 +258,7 @@ export const CuratorSelections = observer(() => {
                       <TableCell>
                         <Badge
                           className={cn({
-                            'text-green-600': approvedSelections.find(
-                              (id) => id === selection.id,
-                            ),
+                            'text-green-600': selection.isConfirmed,
                           })}
                           variant={getStatusBadgeVariant(
                             selection.selectionStatus,
@@ -286,11 +279,11 @@ export const CuratorSelections = observer(() => {
                         {selection.offer?.position ?? 'не определено'}
                       </TableCell>
                       <TableCell>
-                        {selection.selectionStatus ===
-                          SelectionStatus.OfferAccepted &&
-                          !approvedSelections.some(
-                            (id) => id === selection.id,
-                          ) && <SelectionApproveModal selection={selection} />}
+                        {!selection.isConfirmed &&
+                          selection.selectionStatus ===
+                            SelectionStatus.OfferAccepted && (
+                            <SelectionApproveModal selection={selection} />
+                          )}
                       </TableCell>
                     </TableRow>
                   ))}
