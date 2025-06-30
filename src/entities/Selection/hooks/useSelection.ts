@@ -8,4 +8,9 @@ export const useSelection = (selectionId: string) =>
     queryKey: ['selection', selectionId],
     select: (data) => data.data,
     enabled: !!selectionId,
+    staleTime: Infinity,
+    gcTime: 3 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });

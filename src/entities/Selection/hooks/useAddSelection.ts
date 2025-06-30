@@ -13,7 +13,7 @@ export const useAddSelection = () => {
     mutationFn: ({ semesterId, streamId, deadline }) =>
       addSelection(semesterId, streamId, deadline),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['selections'] });
+      queryClient.invalidateQueries({ queryKey: ['globalSelections'] });
     },
   });
 };

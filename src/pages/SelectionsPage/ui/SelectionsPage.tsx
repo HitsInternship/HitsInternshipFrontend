@@ -1,15 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { CurrentSelections, HistorySelections } from '@/pages/SelectionsPage';
+import { CurrentSelections } from '@/pages/SelectionsPage';
 import { UserRole } from '@/entities/User/models';
 import { useStores } from '@/shared/contexts';
 import { SelectionDetailsPage } from '@/pages/SelectionsPage/ui/SelectionDetailsPage.tsx';
 import { CuratorSelections } from '@/pages/SelectionsPage/ui/CuratorSelections.tsx';
 
 export const SelectionsPage = observer(() => {
-  const [isHistoryMode, setIsHistoryMode] = useState(false);
-
   const {
     userStore: { roles },
   } = useStores();
@@ -44,9 +42,5 @@ export const SelectionsPage = observer(() => {
     return <CuratorSelections />;
   }
 
-  return isHistoryMode ? (
-    <HistorySelections setHistoryMode={setIsHistoryMode} />
-  ) : (
-    <CurrentSelections setHistoryMode={setIsHistoryMode} />
-  );
+  return <CurrentSelections />;
 });

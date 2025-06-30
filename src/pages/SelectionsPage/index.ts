@@ -1,1 +1,1 @@
-export { CurrentSelections, HistorySelections, SelectionsPage } from './ui';
+export { CurrentSelections, SelectionsPage } from './ui';

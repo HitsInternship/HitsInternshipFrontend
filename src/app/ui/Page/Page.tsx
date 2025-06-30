@@ -17,6 +17,7 @@ import { GlobalPracticesPage } from '@/pages/GlobalPracticesPage';
 import { PracticePage } from '@/pages/PracticePage';
 import { AppointmentsPage } from '@/pages/AppointmentsPage/ui/AppointmentsPage.tsx';
 import { StatisticsPage } from '@/pages/StatisticsPage/StatisticsPage';
+import { GlobalSelectionsPage } from '@/pages/GlobalSelections';
 
 export const Page: FC = observer(() => {
   return (
@@ -42,7 +43,14 @@ export const Page: FC = observer(() => {
           path={ROUTER_PATHS.CHANGE_PRACTICE}
           element={<ChangePracticePage />}
         />
-        <Route path={ROUTER_PATHS.SELECTIONS} element={<SelectionsPage />} />
+        <Route
+          path={ROUTER_PATHS.SELECTION(':id')}
+          element={<SelectionsPage />}
+        />
+        <Route
+          path={ROUTER_PATHS.SELECTIONS}
+          element={<GlobalSelectionsPage />}
+        />
         <Route
           path={ROUTER_PATHS.PRACTICES}
           element={<GlobalPracticesPage />}

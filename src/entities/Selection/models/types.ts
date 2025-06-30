@@ -1,3 +1,6 @@
+import { Semester } from '@/features/SemesterCRUD';
+import { Stream } from '@/features/StreamsCRUD/model';
+
 export enum SelectionStatus {
   InProgress = 'InProgress',
   Inactive = 'Inactive',
@@ -31,6 +34,7 @@ export enum SelectionVacancyStatus {
   Rejected = 'Rejected',
   GotOffer = 'GotOffer',
   Interview = 'Interview',
+  OfferAccepted = 'OfferAccepted',
 }
 
 export interface SelectionVacancyResponse {
@@ -53,4 +57,15 @@ export interface Selection {
 export interface SelectionExtended extends Selection {
   deadLine: string;
   responses: SelectionVacancyResponse[];
+}
+
+export interface GlobalSelection {
+  id: string;
+  isDeleted: boolean;
+  semester: Semester;
+  stream: Stream;
+}
+
+export interface GetGlobalSelectionResponse extends GlobalSelection {
+  selections: SelectionExtended[];
 }

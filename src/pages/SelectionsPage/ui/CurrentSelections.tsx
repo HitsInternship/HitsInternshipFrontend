@@ -1,12 +1,18 @@
-import { Dispatch, SetStateAction, useMemo, useRef, useState } from 'react';
-import { Filter, LoaderCircle, Send } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+import {
+  Filter,
+  LoaderCircle,
+  Send,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useParams } from 'react-router-dom';
 
 import {
-  Candidate,
-  Selection,
+  type Candidate,
+  type Selection,
   SelectionStatus,
-  useSelections,
 } from '@/entities/Selection';
 import { useGroups } from '@/entities/Groups';
 import { Badge } from '@/shared/ui/badge';
@@ -45,19 +51,19 @@ import { useCreateSelectionComment } from '@/features/MassSelectionComment/hooks
 import { cn } from '@/shared/lib/utils.ts';
 import { SelectionModal } from '@/pages/SelectionsPage/ui/SelectionModal.tsx';
 import { SelectionApproveModal } from '@/features/SelectionApproveModal';
+import { useGlobalSelection } from '@/entities/Selection/hooks/useGlobalSelection.ts';
 
-export interface CurrentSelectionsProps {
-  setHistoryMode: Dispatch<SetStateAction<boolean>>;
-}
+export const CurrentSelections = () => {
+  const params = useParams();
 
-export const CurrentSelections = ({
-  setHistoryMode,
-}: CurrentSelectionsProps) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
   const [groupNumber, setGroupNumber] = useState<number | undefined>();
   const [status, setStatus] = useState<SelectionStatus | undefined>();
   const [company, setCompany] = useState<string | undefined>();
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const massCommentTextarea = useRef<HTMLTextAreaElement | null>(null);
@@ -69,10 +75,15 @@ export const CurrentSelections = ({
     }
   };
 
-  const { data: selections = [], isLoading: selectionsLoading } = useSelections(
-    { groupNumber: groupNumber, isArchive: false, status: status },
-    true,
-  );
+  const { data: selections = [], isLoading: selectionsLoading } =
+    useGlobalSelection(
+      {
+        groupNumber: groupNumber,
+        isArchive: false,
+        status: status,
+      },
+      params.id,
+    );
 
   const { data: groups = [], isLoading: isGroupsLoading } = useGroups();
 
@@ -86,6 +97,17 @@ export const CurrentSelections = ({
           .includes(company.toLowerCase()) ?? false,
     );
   }, [selections, company]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredSelections.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentSelections = filteredSelections.slice(startIndex, endIndex);
+
+  // Reset to first page when filters change
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [groupNumber, status, company]);
 
   const getFullName = (candidate: Candidate) => {
     return `${candidate.surname} ${candidate.name} ${candidate.middlename}`.trim();
@@ -106,9 +128,18 @@ export const CurrentSelections = ({
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIds(filteredSelections.map((s: Selection) => s.id));
+      // Select all items on current page
+      setSelectedIds((prev) => [
+        ...prev.filter(
+          (id) => !currentSelections.map((s) => s.id).includes(id),
+        ),
+        ...currentSelections.map((s: Selection) => s.id),
+      ]);
     } else {
-      setSelectedIds([]);
+      // Deselect all items on current page
+      setSelectedIds((prev) =>
+        prev.filter((id) => !currentSelections.map((s) => s.id).includes(id)),
+      );
     }
   };
 
@@ -125,7 +156,7 @@ export const CurrentSelections = ({
       toast.success('Комментарий успешно добавлен');
     },
     onError: () => {
-      toast.error('Проиошла ошибка');
+      toast.error('Произошла ошибка');
     },
   });
 
@@ -145,6 +176,15 @@ export const CurrentSelections = ({
     closeModal();
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (value: string) => {
+    setItemsPerPage(Number(value));
+    setCurrentPage(1);
+  };
+
   if (isGroupsLoading || selectionsLoading) {
     return (
       <div className='flex items-center justify-center h-[90vh] w-full'>
@@ -158,13 +198,6 @@ export const CurrentSelections = ({
       <div className='flex items-center justify-between'>
         <h1 className='text-3xl font-bold'>Отборы</h1>
         <div className='flex items-center gap-6'>
-          <Button
-            onClick={() => {
-              setHistoryMode(true);
-            }}
-          >
-            Посмотреть архив
-          </Button>
           <Badge variant='secondary'>Выбрано: {selectedIds.length}</Badge>
           {selectedIds.length > 0 && (
             <>
@@ -294,7 +327,33 @@ export const CurrentSelections = ({
 
       <Card>
         <CardHeader>
-          <CardTitle>Список отборов</CardTitle>
+          <div className='flex items-center justify-between'>
+            <CardTitle>Список отборов</CardTitle>
+            <div className='flex items-center gap-4'>
+              <div className='flex items-center gap-2'>
+                <Label className='text-sm'>Показать:</Label>
+                <Select
+                  value={itemsPerPage.toString()}
+                  onValueChange={handleItemsPerPageChange}
+                >
+                  <SelectTrigger className='w-20'>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='5'>5</SelectItem>
+                    <SelectItem value='10'>10</SelectItem>
+                    <SelectItem value='20'>20</SelectItem>
+                    <SelectItem value='50'>50</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className='text-sm text-muted-foreground'>
+                Показано {startIndex + 1}-
+                {Math.min(endIndex, filteredSelections.length)} из{' '}
+                {filteredSelections.length}
+              </div>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {selectionsLoading ? (
@@ -302,87 +361,161 @@ export const CurrentSelections = ({
               <div className='text-muted-foreground'>Загрузка...</div>
             </div>
           ) : (
-            <div className='rounded-md border'>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className='w-12'>
-                      <Checkbox
-                        checked={
-                          selectedIds.length === filteredSelections.length &&
-                          filteredSelections.length > 0
-                        }
-                        onCheckedChange={handleSelectAll}
-                      />
-                    </TableHead>
-                    <TableHead>ФИО</TableHead>
-                    <TableHead>Статус</TableHead>
-                    <TableHead>Компания</TableHead>
-                    <TableHead>Должность</TableHead>
-                    <TableHead className='w-12' />
-                    <TableHead className='w-12' />
-                    <TableHead className='w-12' />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredSelections.map((selection: Selection) => (
-                    <TableRow key={selection.id}>
-                      <TableCell>
+            <>
+              <div className='rounded-md border'>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className='w-12'>
                         <Checkbox
-                          checked={selectedIds.includes(selection.id)}
-                          onCheckedChange={(checked) =>
-                            handleSelectRow(selection.id, checked as boolean)
+                          checked={
+                            currentSelections.length > 0 &&
+                            currentSelections.every((selection) =>
+                              selectedIds.includes(selection.id),
+                            )
                           }
+                          onCheckedChange={handleSelectAll}
                         />
-                      </TableCell>
-                      <TableCell>{getFullName(selection.candidate)}</TableCell>
-                      <TableCell>
-                        <Badge
-                          className={cn({
-                            'text-green-600': selection.isConfirmed,
-                          })}
-                          variant={getStatusBadgeVariant(
-                            selection.selectionStatus,
-                          )}
-                        >
-                          {selection.selectionStatus ===
-                            SelectionStatus.InProgress && 'Активный'}
-                          {selection.selectionStatus ===
-                            SelectionStatus.OfferAccepted && 'Оффер'}
-                          {selection.selectionStatus ===
-                            SelectionStatus.Inactive && 'Неактивный'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {selection.offer?.companyName ?? 'не определено'}
-                      </TableCell>
-                      <TableCell className='font-medium'>
-                        {selection.offer?.position ?? 'не определено'}
-                      </TableCell>
-                      <TableCell>
-                        <SelectionModal selectionId={selection.id} />
-                      </TableCell>
-                      <TableCell>
-                        <SelectionChatModal selectionId={selection.id} />
-                      </TableCell>
-                      <TableCell>
-                        {!selection.isConfirmed &&
-                          selection.selectionStatus ===
-                            SelectionStatus.OfferAccepted && (
-                            <SelectionApproveModal selection={selection} />
-                          )}
-                      </TableCell>
+                      </TableHead>
+                      <TableHead>ФИО</TableHead>
+                      <TableHead>Статус</TableHead>
+                      <TableHead>Компания</TableHead>
+                      <TableHead>Должность</TableHead>
+                      <TableHead className='w-12' />
+                      <TableHead className='w-12' />
+                      <TableHead className='w-12' />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {currentSelections.map((selection: Selection) => (
+                      <TableRow key={selection.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedIds.includes(selection.id)}
+                            onCheckedChange={(checked) =>
+                              handleSelectRow(selection.id, checked as boolean)
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          {getFullName(selection.candidate)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={cn({
+                              'text-green-600': selection.isConfirmed,
+                            })}
+                            variant={getStatusBadgeVariant(
+                              selection.selectionStatus,
+                            )}
+                          >
+                            {selection.selectionStatus ===
+                              SelectionStatus.InProgress && 'Активный'}
+                            {selection.selectionStatus ===
+                              SelectionStatus.OfferAccepted && 'Оффер'}
+                            {selection.selectionStatus ===
+                              SelectionStatus.Inactive && 'Неактивный'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {selection.offer?.companyName ?? 'не определено'}
+                        </TableCell>
+                        <TableCell className='font-medium'>
+                          {selection.offer?.position ?? 'не определено'}
+                        </TableCell>
+                        <TableCell>
+                          <SelectionModal selectionId={selection.id} />
+                        </TableCell>
+                        <TableCell>
+                          <SelectionChatModal selectionId={selection.id} />
+                        </TableCell>
+                        <TableCell>
+                          {!selection.isConfirmed &&
+                            selection.selectionStatus ===
+                              SelectionStatus.OfferAccepted && (
+                              <SelectionApproveModal selection={selection} />
+                            )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
 
-              {filteredSelections.length === 0 && (
-                <div className='text-center p-8 text-muted-foreground'>
-                  Отборы не найдены
+                {filteredSelections.length === 0 && (
+                  <div className='text-center p-8 text-muted-foreground'>
+                    Отборы не найдены
+                  </div>
+                )}
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className='flex items-center justify-between mt-4'>
+                  <div className='flex items-center gap-2'>
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className='h-4 w-4' />
+                      Назад
+                    </Button>
+
+                    <div className='flex items-center gap-1'>
+                      {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .filter((page) => {
+                          // Show first page, last page, current page, and pages around current
+                          return (
+                            page === 1 ||
+                            page === totalPages ||
+                            Math.abs(page - currentPage) <= 1
+                          );
+                        })
+                        .map((page, index, array) => {
+                          // Add ellipsis if there's a gap
+                          const showEllipsis =
+                            index > 0 && page - array[index - 1] > 1;
+
+                          return (
+                            <div key={page} className='flex items-center'>
+                              {showEllipsis && (
+                                <span className='px-2 text-muted-foreground'>
+                                  ...
+                                </span>
+                              )}
+                              <Button
+                                variant={
+                                  currentPage === page ? 'default' : 'outline'
+                                }
+                                size='sm'
+                                onClick={() => handlePageChange(page)}
+                                className='w-8 h-8 p-0'
+                              >
+                                {page}
+                              </Button>
+                            </div>
+                          );
+                        })}
+                    </div>
+
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Вперед
+                      <ChevronRight className='h-4 w-4' />
+                    </Button>
+                  </div>
+
+                  <div className='text-sm text-muted-foreground'>
+                    Страница {currentPage} из {totalPages}
+                  </div>
                 </div>
               )}
-            </div>
+            </>
           )}
         </CardContent>
       </Card>

@@ -1,13 +1,9 @@
 import { useMemo, useRef, useState } from 'react';
 import { Filter, LoaderCircle, Send } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
+import { useParams } from 'react-router-dom';
 
-import {
-  Candidate,
-  Selection,
-  SelectionStatus,
-  useSelections,
-} from '@/entities/Selection';
+import { Candidate, Selection, SelectionStatus } from '@/entities/Selection';
 import { Badge } from '@/shared/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Label } from '@/shared/ui/label';
@@ -39,11 +35,13 @@ import {
 } from '@/shared/ui';
 import { SelectionApproveModal } from '@/features/SelectionApproveModal';
 import { cn } from '@/shared/lib/utils.ts';
+import { useGlobalSelection } from '@/entities/Selection/hooks';
 
 export const CuratorSelections = observer(() => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [status, setStatus] = useState<SelectionStatus | undefined>();
   const [company, setCompany] = useState<string | undefined>();
+  const params = useParams();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const massCommentTextarea = useRef<HTMLTextAreaElement | null>(null);
@@ -55,10 +53,8 @@ export const CuratorSelections = observer(() => {
     }
   };
 
-  const { data: selections = [], isLoading: selectionsLoading } = useSelections(
-    { status: status },
-    true,
-  );
+  const { data: selections = [], isLoading: selectionsLoading } =
+    useGlobalSelection({ status: status }, params.id);
 
   const filteredSelections = useMemo(() => {
     if (!company) return selections;
@@ -72,7 +68,7 @@ export const CuratorSelections = observer(() => {
   }, [selections, company]);
 
   const getFullName = (candidate: Candidate) => {
-    return `${candidate.surname} ${candidate.name} ${candidate.middlename}`.trim();
+    return `${candidate?.surname} ${candidate?.name} ${candidate?.middlename}`.trim();
   };
 
   const getStatusBadgeVariant = (status: string) => {
