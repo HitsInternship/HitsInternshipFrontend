@@ -7,4 +7,4 @@ export const archiveGlobalSelection = ({
   params,
   config,
 }: ArchiveGlobalSelectionConfig) =>
-  api.post(`/api/selection/global/${params.selectionId}/confirm`, config);
+  api.post(`/api/selection/global/${params.selectionId}/archive`, config);

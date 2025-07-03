@@ -23,10 +23,11 @@ export const EmployeeProfilePage = observer(() => {
     userStore: { roles },
   } = useStores();
 
-  const { data: deanMemberData } = useDeanMemberData();
-  const { data: curatorData } = useCuratorData();
-
   const isDeanMember = roles.includes(UserRole.DeanMember);
+  const isCurator = roles.includes(UserRole.Curator);
+
+  const { data: deanMemberData } = useDeanMemberData(isDeanMember);
+  const { data: curatorData } = useCuratorData(isCurator);
 
   if (!deanMemberData && !curatorData) {
     return null;

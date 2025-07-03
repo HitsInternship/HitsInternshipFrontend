@@ -6,12 +6,9 @@ import {
   Archive,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 import {
-  Button,
   Card,
   CardContent,
   CardHeader,
@@ -22,10 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui';
-import {
-  useArchiveSelection,
-  useGlobalSelections,
-} from '@/entities/Selection/hooks';
+import { useGlobalSelections } from '@/entities/Selection/hooks';
 import { ROUTER_PATHS } from '@/shared/consts';
 import {
   TooltipContent,
@@ -33,6 +27,7 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/tooltip';
 import { Tooltip } from '@/shared/ui/tooltip.tsx';
+import { ArchiveGlobalSelection } from '@/pages/GlobalSelections/ui/ArchiveGlobalSelection.tsx';
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('ru-Ru', {
@@ -44,27 +39,10 @@ const formatDate = (dateString: string) => {
 
 export const GlobalSelectionsPage = () => {
   const [archiveFilter, setArchiveFilter] = useState('active');
-  const queryClient = useQueryClient();
   const { data: selections, isLoading } = useGlobalSelections(
     archiveFilter !== 'active',
   );
   const navigate = useNavigate();
-
-  const { mutate } = useArchiveSelection({
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['globalSelections', archiveFilter],
-      });
-      toast.success('Отбор успешно заархивирован');
-    },
-    onError: () => {
-      toast.error('Произошла ошибка');
-    },
-  });
-
-  const archiveGlobalSelection = (id: string) => {
-    mutate({ params: { selectionId: id } });
-  };
 
   if (isLoading) {
     return;
@@ -99,35 +77,32 @@ export const GlobalSelectionsPage = () => {
             <Card
               key={selection.id}
               className={`hover:shadow-lg transition-shadow ${selection.isDeleted ? 'opacity-75 border-dashed' : ''}`}
-              onClick={() => {
-                navigate(ROUTER_PATHS.SELECTION(selection.id));
-              }}
             >
               <CardHeader className='pb-3'>
                 <div className='flex items-center justify-between'>
-                  <CardTitle className='text-lg flex items-center gap-2'>
+                  <CardTitle
+                    className='text-lg flex items-center gap-2 hover:underline hover:decoration-2 underline-offset-2 transition-all duration-200 cursor-pointer'
+                    onClick={() => {
+                      navigate(ROUTER_PATHS.SELECTION(selection.id));
+                    }}
+                  >
                     Отбор потока {selection.stream.streamNumber}
                     {selection.isDeleted && (
                       <Archive className='h-4 w-4 text-muted-foreground' />
                     )}
                   </CardTitle>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          onClick={() => archiveGlobalSelection(selection.id)}
-                          className='h-8 w-8 p-0'
-                        >
-                          <Archive className='h-4 w-4' />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Добавить в архив</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {!selection.isDeleted && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <ArchiveGlobalSelection id={selection.id} />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Добавить в архив</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                 </div>
               </CardHeader>
               <CardContent className='space-y-4'>
