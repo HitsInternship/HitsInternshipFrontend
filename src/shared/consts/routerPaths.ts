@@ -16,4 +16,5 @@ export const ROUTER_PATHS = {
   APPOINTMENTS: '/appointments',
   GLOBAL_SELECTIONS: '/selections',
   SELECTION: (id: string) => `/selections/${id}`,
+  MY_SELECTIONS: '/my-selections',
 };

@@ -33,6 +33,8 @@ const getResponseStatusLabel = (status: SelectionVacancyStatus) => {
       return 'Получил оффер';
     case SelectionVacancyStatus.Interview:
       return 'Собеседование';
+    case SelectionVacancyStatus.OfferAccepted:
+      return 'Оффер принят';
     default:
       return status;
   }
@@ -298,6 +300,13 @@ export const SelectionDetailsPage = () => {
                                   >
                                     {getResponseStatusLabel(
                                       SelectionVacancyStatus.Rejected,
+                                    )}
+                                  </SelectItem>
+                                  <SelectItem
+                                    value={SelectionVacancyStatus.OfferAccepted}
+                                  >
+                                    {getResponseStatusLabel(
+                                      SelectionVacancyStatus.OfferAccepted,
                                     )}
                                   </SelectItem>
                                 </SelectContent>

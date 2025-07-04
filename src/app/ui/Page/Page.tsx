@@ -47,6 +47,7 @@ export const Page: FC = observer(() => {
           path={ROUTER_PATHS.SELECTION(':id')}
           element={<SelectionsPage />}
         />
+        <Route path={ROUTER_PATHS.MY_SELECTIONS} element={<SelectionsPage />} />
         <Route
           path={ROUTER_PATHS.SELECTIONS}
           element={<GlobalSelectionsPage />}
